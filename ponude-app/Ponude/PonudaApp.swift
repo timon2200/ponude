@@ -1,8 +1,11 @@
 import SwiftUI
 import SwiftData
+import Sparkle
 
 @main
 struct PonudaApp: App {
+    @StateObject private var updaterViewModel = UpdaterViewModel()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -20,6 +23,10 @@ struct PonudaApp: App {
                     NotificationCenter.default.post(name: .createNewQuote, object: nil)
                 }
                 .keyboardShortcut("n", modifiers: .command)
+            }
+            
+            CommandGroup(after: .appInfo) {
+                CheckForUpdatesView(updaterViewModel: updaterViewModel)
             }
         }
         

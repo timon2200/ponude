@@ -30,6 +30,7 @@
 		F082C12B209F7BE6453413F8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AE558A6FD0B0FEEA066BDB /* Client.swift */; };
 		F1A2B3C4D5E6F7081234ABCD /* QuoteTemplateStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */; };
 		F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */; };
+		DD22EE33FF44AA55BB660001 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentClientsService.swift; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE550004 /* frequent_clients.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = frequent_clients.json; sourceTree = "<group>"; };
 		F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudregService.swift; sourceTree = "<group>"; };
+		DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -104,6 +106,7 @@
 				AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */,
 				4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */,
 				F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */,
+				DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 				F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */,
 				758F3999FABDA6FF37EC6CEE /* SettingsView.swift in Sources */,
 				7248235991783CAC6CFF7D8A /* SudregService.swift in Sources */,
+				DD22EE33FF44AA55BB660001 /* UpdaterViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

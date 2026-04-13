@@ -19,6 +19,7 @@ DerivedData/
 
 # Swift Package Manager
 .swiftpm/
+Package.resolved
 
 # Python
 venv/
@@ -27,3 +28,6 @@ __pycache__/
 
 # PDFs (generated output)
 *.pdf
+
+# Sparkle private key (NEVER commit this)
+sparkle_private_key.txt
