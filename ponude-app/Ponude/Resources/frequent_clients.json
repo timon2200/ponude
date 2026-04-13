@@ -1,0 +1,130 @@
+[
+  {
+    "name": "Turistička zajednica grada Varaždina",
+    "oib": "85989550514",
+    "address": "Ivana Padovca 3",
+    "city": "Varaždin",
+    "zipCode": "42000",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica Varaždinske županije",
+    "oib": "47150552254",
+    "address": "Franjevački trg 7",
+    "city": "Varaždin",
+    "zipCode": "42000",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica grada Ludbrega",
+    "oib": "30919679371",
+    "address": "Trg Svetog Trojstva 14",
+    "city": "Ludbreg",
+    "zipCode": "42230",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica grada Ivanca",
+    "oib": "14546502868",
+    "address": "Trg hrvatskih ivanovaca 4",
+    "city": "Ivanec",
+    "zipCode": "42240",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica Grada Novog Marofa",
+    "oib": "43160525483",
+    "address": "Antuna Mihanovića 3",
+    "city": "Novi Marof",
+    "zipCode": "42220",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica grada Varaždinskih Toplica",
+    "oib": "65063917591",
+    "address": "Trg svetog Martina 5",
+    "city": "Varaždinske Toplice",
+    "zipCode": "42223",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica grada Lepoglave",
+    "oib": "77894431346",
+    "address": "Hrvatskih pavlina 7",
+    "city": "Lepoglava",
+    "zipCode": "42250",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Turistička zajednica grada Koprivnice",
+    "oib": "55659359419",
+    "address": "Trg bana Josipa Jelačića 7",
+    "city": "Koprivnica",
+    "zipCode": "48000",
+    "category": "turistička_zajednica"
+  },
+  {
+    "name": "Grad Varaždin",
+    "oib": "13269011531",
+    "address": "Trg kralja Tomislava 1",
+    "city": "Varaždin",
+    "zipCode": "42000",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Ivanec",
+    "oib": "84121580205",
+    "address": "Trg hrvatskih ivanovaca 9b",
+    "city": "Ivanec",
+    "zipCode": "42240",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Ludbreg",
+    "oib": "84947290034",
+    "address": "Trg Svetog Trojstva 14",
+    "city": "Ludbreg",
+    "zipCode": "42230",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Novi Marof",
+    "oib": "71070402969",
+    "address": "Trg hrvatske državnosti 1",
+    "city": "Novi Marof",
+    "zipCode": "42220",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Varaždinske Toplice",
+    "oib": "54177232254",
+    "address": "Ulica dr. Franje Tuđmana 4",
+    "city": "Varaždinske Toplice",
+    "zipCode": "42223",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Lepoglava",
+    "oib": "79368224789",
+    "address": "Ulica Antuna Mihanovića 12",
+    "city": "Lepoglava",
+    "zipCode": "42250",
+    "category": "grad"
+  },
+  {
+    "name": "Grad Koprivnica",
+    "oib": "62112914641",
+    "address": "Zrinski trg 1",
+    "city": "Koprivnica",
+    "zipCode": "48000",
+    "category": "grad"
+  },
+  {
+    "name": "Varaždinska županija",
+    "oib": "15877210917",
+    "address": "Franjevački trg 7",
+    "city": "Varaždin",
+    "zipCode": "42000",
+    "category": "županija"
+  }
+]

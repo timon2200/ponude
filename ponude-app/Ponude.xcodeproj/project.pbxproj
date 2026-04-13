@@ -1,0 +1,494 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CC11DD22EE33FF44AA550001 /* AddCompanyWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */; };
+		BB01AA22DD33EE44FF660001 /* DebouncedPreviewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */; };
+		191C4CB03E1A07021F57FF48 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4186B473F71E17FE1D766FD /* DashboardView.swift */; };
+		3A20D994ED5886B934734B0F /* QuoteBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */; };
+		40A6F815712900B506D8FF42 /* ClientListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44CB7A5AA2416DA029F7C59F /* ClientListView.swift */; };
+		AA11BB22CC33DD44EE550001 /* FrequentClientsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */; };
+		AA11BB22CC33DD44EE550003 /* frequent_clients.json in Resources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550004 /* frequent_clients.json */; };
+		7248235991783CAC6CFF7D8A /* SudregService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */; };
+		758F3999FABDA6FF37EC6CEE /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A70A9721A650B894E8697B4 /* SettingsView.swift */; };
+		8E3B597D85FD1DCFC55A00FD /* BusinessProfileEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */; };
+		8F91ABD8258CD28CB89CA7F8 /* ClientSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB19A3C44790303A8FA05ED /* ClientSelectorView.swift */; };
+		923FA68A30D33A9FAC06EF43 /* QuoteBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */; };
+		9B93148A713635A9CF8B6067 /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */; };
+		A032986D644DA777EA15FCAF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49858D69164BA72FFA68EEC /* Extensions.swift */; };
+		A099BCDFE2A8366E4748E070 /* PonudaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6B04E4ADE9B14DEB43C4BCB /* PonudaApp.swift */; };
+		AF4ABEFBD943B1E59896E24D /* Ponuda.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2284FF2E6629EE5E192362BB /* Ponuda.swift */; };
+		C6CF56FECEF206E12E3788F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F6EE8C198A3307E10ED0CE1 /* Assets.xcassets */; };
+		D4F9F8E18A596C948DE96286 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D95F792287F75B5AC9C4D5A /* ContentView.swift */; };
+		D57B5FE92F0B521328DD79BB /* BusinessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90835610663B7A75507F1709 /* BusinessProfile.swift */; };
+		E76C1F3CA5BAC5A64C4123C7 /* QuotePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */; };
+		F082C12B209F7BE6453413F8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AE558A6FD0B0FEEA066BDB /* Client.swift */; };
+		F1A2B3C4D5E6F7081234ABCD /* QuoteTemplateStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */; };
+		F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		037601514E9D2C050BA1067D /* Ponude.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ponude.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2284FF2E6629EE5E192362BB /* Ponuda.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ponuda.swift; sourceTree = "<group>"; };
+		CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCompanyWizardView.swift; sourceTree = "<group>"; };
+		2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteBuilderView.swift; sourceTree = "<group>"; };
+		BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebouncedPreviewWrapper.swift; sourceTree = "<group>"; };
+		36AE558A6FD0B0FEEA066BDB /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		3A70A9721A650B894E8697B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		44CB7A5AA2416DA029F7C59F /* ClientListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListView.swift; sourceTree = "<group>"; };
+		4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
+		4F6EE8C198A3307E10ED0CE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6AB19A3C44790303A8FA05ED /* ClientSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSelectorView.swift; sourceTree = "<group>"; };
+		7B40EB5BEAEDB7A2519AC5A7 /* Ponude.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ponude.entitlements; sourceTree = "<group>"; };
+		7D95F792287F75B5AC9C4D5A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteBuilderViewModel.swift; sourceTree = "<group>"; };
+		8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessProfileEditor.swift; sourceTree = "<group>"; };
+		90835610663B7A75507F1709 /* BusinessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessProfile.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteTemplateStyle.swift; sourceTree = "<group>"; };
+		A6B04E4ADE9B14DEB43C4BCB /* PonudaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PonudaApp.swift; sourceTree = "<group>"; };
+		AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceItemRow.swift; sourceTree = "<group>"; };
+		B49858D69164BA72FFA68EEC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotePreviewView.swift; sourceTree = "<group>"; };
+		E4186B473F71E17FE1D766FD /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentClientsService.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE550004 /* frequent_clients.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = frequent_clients.json; sourceTree = "<group>"; };
+		F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudregService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0099D3792B7459593978777D /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */,
+				2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */,
+				C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */,
+				AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */,
+			);
+			path = Builder;
+			sourceTree = "<group>";
+		};
+		5CE63026702B9F68DEBBF701 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				B49858D69164BA72FFA68EEC /* Extensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		5FF32D6E045D238F351C5B63 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */,
+				8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */,
+				3A70A9721A650B894E8697B4 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		6BF444BBD6E85AAE3704FD3F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				037601514E9D2C050BA1067D /* Ponude.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ADD8969BF20AC22AC5D25FA2 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */,
+				4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */,
+				F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B1D9054257B3724DE5059F18 /* Clients */ = {
+			isa = PBXGroup;
+			children = (
+				44CB7A5AA2416DA029F7C59F /* ClientListView.swift */,
+				6AB19A3C44790303A8FA05ED /* ClientSelectorView.swift */,
+			);
+			path = Clients;
+			sourceTree = "<group>";
+		};
+		BC726332BD6ADCF819F50084 = {
+			isa = PBXGroup;
+			children = (
+				F1DAA905B91416E10A1A57C5 /* Ponude */,
+				6BF444BBD6E85AAE3704FD3F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C03D2C421E841AC309994559 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		D460E43623C819EBC50F9EE0 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				E4186B473F71E17FE1D766FD /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		DF09C53A035D93415DC58CBC /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				90835610663B7A75507F1709 /* BusinessProfile.swift */,
+				36AE558A6FD0B0FEEA066BDB /* Client.swift */,
+				2284FF2E6629EE5E192362BB /* Ponuda.swift */,
+				A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA11BB22CC33DD44EE550005 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA11BB22CC33DD44EE550004 /* frequent_clients.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F1DAA905B91416E10A1A57C5 /* Ponude */ = {
+			isa = PBXGroup;
+			children = (
+				5CE63026702B9F68DEBBF701 /* Helpers */,
+				DF09C53A035D93415DC58CBC /* Models */,
+				AA11BB22CC33DD44EE550005 /* Resources */,
+				ADD8969BF20AC22AC5D25FA2 /* Services */,
+				C03D2C421E841AC309994559 /* ViewModels */,
+				FAC530A58D822B5AF0E919DC /* Views */,
+				4F6EE8C198A3307E10ED0CE1 /* Assets.xcassets */,
+				7D95F792287F75B5AC9C4D5A /* ContentView.swift */,
+				A6B04E4ADE9B14DEB43C4BCB /* PonudaApp.swift */,
+				7B40EB5BEAEDB7A2519AC5A7 /* Ponude.entitlements */,
+			);
+			path = Ponude;
+			sourceTree = "<group>";
+		};
+		FAC530A58D822B5AF0E919DC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0099D3792B7459593978777D /* Builder */,
+				B1D9054257B3724DE5059F18 /* Clients */,
+				D460E43623C819EBC50F9EE0 /* Dashboard */,
+				5FF32D6E045D238F351C5B63 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13C4A6F4D6C3914CBCAD19DC /* Ponude */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A6BD114A5BB62923E019AE9 /* Build configuration list for PBXNativeTarget "Ponude" */;
+			buildPhases = (
+				BE394A62662F05A9BA6D803B /* Sources */,
+				F54803FD08846E100E0071FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ponude;
+			packageProductDependencies = (
+			);
+			productName = Ponude;
+			productReference = 037601514E9D2C050BA1067D /* Ponude.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EB7556D6C36A0B8FE0933A01 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					13C4A6F4D6C3914CBCAD19DC = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 82F9EE8498F326B2301DEB69 /* Build configuration list for PBXProject "Ponude" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = BC726332BD6ADCF819F50084;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6BF444BBD6E85AAE3704FD3F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				13C4A6F4D6C3914CBCAD19DC /* Ponude */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F54803FD08846E100E0071FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C6CF56FECEF206E12E3788F2 /* Assets.xcassets in Resources */,
+				AA11BB22CC33DD44EE550003 /* frequent_clients.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BE394A62662F05A9BA6D803B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC11DD22EE33FF44AA550001 /* AddCompanyWizardView.swift in Sources */,
+				D57B5FE92F0B521328DD79BB /* BusinessProfile.swift in Sources */,
+				8E3B597D85FD1DCFC55A00FD /* BusinessProfileEditor.swift in Sources */,
+				F082C12B209F7BE6453413F8 /* Client.swift in Sources */,
+				40A6F815712900B506D8FF42 /* ClientListView.swift in Sources */,
+				8F91ABD8258CD28CB89CA7F8 /* ClientSelectorView.swift in Sources */,
+				D4F9F8E18A596C948DE96286 /* ContentView.swift in Sources */,
+				BB01AA22DD33EE44FF660001 /* DebouncedPreviewWrapper.swift in Sources */,
+				191C4CB03E1A07021F57FF48 /* DashboardView.swift in Sources */,
+				A032986D644DA777EA15FCAF /* Extensions.swift in Sources */,
+				AA11BB22CC33DD44EE550001 /* FrequentClientsService.swift in Sources */,
+				9B93148A713635A9CF8B6067 /* PDFGenerator.swift in Sources */,
+				AF4ABEFBD943B1E59896E24D /* Ponuda.swift in Sources */,
+				A099BCDFE2A8366E4748E070 /* PonudaApp.swift in Sources */,
+				923FA68A30D33A9FAC06EF43 /* QuoteBuilderView.swift in Sources */,
+				3A20D994ED5886B934734B0F /* QuoteBuilderViewModel.swift in Sources */,
+				E76C1F3CA5BAC5A64C4123C7 /* QuotePreviewView.swift in Sources */,
+				F1A2B3C4D5E6F7081234ABCD /* QuoteTemplateStyle.swift in Sources */,
+				F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */,
+				758F3999FABDA6FF37EC6CEE /* SettingsView.swift in Sources */,
+				7248235991783CAC6CFF7D8A /* SudregService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0CB4B87D258A7A56C3F723D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Ponude/Ponude.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ponude;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = hr.lotusrc.ponude;
+				PRODUCT_NAME = Ponude;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		53E28355179FB0EBB1E5D410 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.10;
+			};
+			name = Release;
+		};
+		A2179A6A303494A77210F533 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.10;
+			};
+			name = Debug;
+		};
+		CE1A1593B782E6DD3E01C999 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Ponude/Ponude.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ponude;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = hr.lotusrc.ponude;
+				PRODUCT_NAME = Ponude;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7A6BD114A5BB62923E019AE9 /* Build configuration list for PBXNativeTarget "Ponude" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE1A1593B782E6DD3E01C999 /* Debug */,
+				0CB4B87D258A7A56C3F723D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		82F9EE8498F326B2301DEB69 /* Build configuration list for PBXProject "Ponude" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2179A6A303494A77210F533 /* Debug */,
+				53E28355179FB0EBB1E5D410 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EB7556D6C36A0B8FE0933A01 /* Project object */;
+}

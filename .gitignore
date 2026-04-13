@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+ponude-app/.build/
+ponude-app/build/
+ponude-app/Ponude.xcodeproj/project.xcworkspace/xcuserdata/
+ponude-app/Ponude.xcodeproj/xcuserdata/
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.swiftpm/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# PDFs (generated output)
+*.pdf
