@@ -48,14 +48,17 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           ZIP_FILE="build/Ponude-${{ steps.version.outputs.version }}.zip"
-          
-          # Import private key into keychain for sign_update tool
           SIGN_TOOL=".build/artifacts/sparkle/Sparkle/bin/sign_update"
           
-          # Sign the zip and capture the signature attributes
-          SIGN_OUTPUT=$("$SIGN_TOOL" "$ZIP_FILE" --ed-key-file <(echo "$SPARKLE_PRIVATE_KEY") 2>&1)
-          echo "sign_attrs=$SIGN_OUTPUT" >> $GITHUB_OUTPUT
-          echo "Sparkle signature: $SIGN_OUTPUT"
+          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
+            echo "⚠️ SPARKLE_PRIVATE_KEY secret not set, skipping signing"
+            echo "sign_attrs=" >> $GITHUB_OUTPUT
+          else
+            # Sign the zip using stdin for the private key
+            SIGN_OUTPUT=$(echo "$SPARKLE_PRIVATE_KEY" | "$SIGN_TOOL" --ed-key-file - "$ZIP_FILE" 2>&1)
+            echo "sign_attrs=$SIGN_OUTPUT" >> $GITHUB_OUTPUT
+            echo "✅ Sparkle signature: $SIGN_OUTPUT"
+          fi
 
       - name: Generate appcast.xml
         working-directory: ponude-app
@@ -64,16 +67,23 @@ jobs:
           TAG="${{ steps.version.outputs.tag }}"
           ZIP_FILE="Ponude-${VERSION}.zip"
           ZIP_SIZE=$(stat -f%z "build/$ZIP_FILE")
-          SIGN_ATTRS='${{ steps.sparkle_sign.outputs.sign_attrs }}'
-          
-          # Parse edSignature and length from sign_attrs  
-          # Format: sparkle:edSignature="..." length="..."
-          ED_SIG=$(echo "$SIGN_ATTRS" | grep -o 'sparkle:edSignature="[^"]*"' | head -1 || echo "")
-          LENGTH_ATTR=$(echo "$SIGN_ATTRS" | grep -o 'length="[^"]*"' | head -1 || echo "length=\"$ZIP_SIZE\"")
+          SIGN_ATTRS="${{ steps.sparkle_sign.outputs.sign_attrs }}"
           
           DOWNLOAD_URL="https://github.com/timon2200/ponude/releases/download/${TAG}/${ZIP_FILE}"
           BUILD_NUMBER=$(git rev-list --count HEAD)
           PUB_DATE=$(date -u "+%a, %d %b %Y %H:%M:%S %z")
+          
+          # Build the enclosure attributes
+          ENCLOSURE_ATTRS="url=\"${DOWNLOAD_URL}\" type=\"application/octet-stream\" length=\"${ZIP_SIZE}\""
+          
+          # Add Sparkle signature if available
+          if [ -n "$SIGN_ATTRS" ]; then
+            # Extract edSignature from the sign_update output
+            ED_SIG=$(echo "$SIGN_ATTRS" | grep -oE 'sparkle:edSignature="[^"]*"' || echo "")
+            if [ -n "$ED_SIG" ]; then
+              ENCLOSURE_ATTRS="$ENCLOSURE_ATTRS $ED_SIG"
+            fi
+          fi
           
           cat > build/appcast.xml << EOF
           <?xml version="1.0" encoding="utf-8"?>
@@ -88,14 +98,14 @@ jobs:
                 <sparkle:version>${BUILD_NUMBER}</sparkle:version>
                 <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
                 <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-                <enclosure url="${DOWNLOAD_URL}"
-                           type="application/octet-stream"
-                           ${ED_SIG}
-                           ${LENGTH_ATTR} />
+                <enclosure ${ENCLOSURE_ATTRS} />
               </item>
             </channel>
           </rss>
           EOF
+          
+          # Remove leading whitespace from heredoc
+          sed -i '' 's/^          //' build/appcast.xml
           
           echo "✅ appcast.xml generated:"
           cat build/appcast.xml
@@ -107,13 +117,13 @@ jobs:
           body: |
             ## Ponude ${{ steps.version.outputs.version }}
             
-            ### Installation
-            1. Download `Ponude-${{ steps.version.outputs.version }}.zip`
-            2. Extract and move `Ponude.app` to your Applications folder
-            3. Right-click → Open (first time only)
+            ### Instalacija
+            1. Preuzmi `Ponude-${{ steps.version.outputs.version }}.zip`
+            2. Raspakiraj i premjesti `Ponude.app` u Applications mapu
+            3. Desni klik → Otvori (samo prvi put)
             
-            ### Auto-Update
-            If you already have Ponude installed, the app will automatically notify you of this update.
+            ### Automatska ažuriranja
+            Ako već koristite Ponude, aplikacija će vas automatski obavijestiti o novoj verziji.
           files: |
             ponude-app/build/Ponude-${{ steps.version.outputs.version }}.zip
             ponude-app/build/appcast.xml
