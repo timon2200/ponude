@@ -40,7 +40,9 @@ echo "🏷  Version: ${MARKETING_VERSION} (build ${BUILD_NUMBER})"
 # ──────────────────────────────────────────────────────────
 echo "🔨 Building ${APP_NAME}..."
 cd "$SCRIPT_DIR"
-swift build -c release 2>&1
+swift build -c release \
+    -Xlinker -rpath -Xlinker @executable_path/../Frameworks \
+    2>&1
 
 echo "📦 Creating app bundle..."
 rm -rf "$APP_BUNDLE"
@@ -50,6 +52,10 @@ mkdir -p "$FRAMEWORKS_DIR"
 
 # Copy executable
 cp "$BUILD_DIR/${APP_NAME}" "$MACOS_DIR/${APP_NAME}"
+
+# Add @executable_path/../Frameworks rpath so the binary can find embedded frameworks
+install_name_tool -add_rpath @executable_path/../Frameworks "$MACOS_DIR/${APP_NAME}" 2>/dev/null || true
+echo "  ✓ rpath set to @executable_path/../Frameworks"
 
 # ──────────────────────────────────────────────────────────
 # Sparkle framework — embed in app bundle
