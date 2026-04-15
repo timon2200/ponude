@@ -34,11 +34,23 @@ final class FrequentClientsService {
     func search(query: String) -> [FrequentClient] {
         guard !query.isEmpty else { return [] }
         
-        let lowered = query.lowercased()
+        // Split query into individual words for multi-word matching
+        let words = query.lowercased()
+            .split(separator: " ")
+            .map(String.init)
+            .filter { !$0.isEmpty }
+        
+        guard !words.isEmpty else { return [] }
         
         return clients.filter { client in
-            client.name.lowercased().contains(lowered) ||
-            client.oib.hasPrefix(query)
+            // OIB prefix match
+            if client.oib.hasPrefix(query) { return true }
+            
+            // All words must appear somewhere in the name (diacritic-insensitive)
+            let name = client.name
+            return words.allSatisfy { word in
+                name.range(of: word, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            }
         }
     }
     

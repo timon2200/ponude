@@ -16,10 +16,24 @@ struct ClientListView: View {
     
     private var filteredClients: [Client] {
         if searchText.isEmpty { return clients }
-        return clients.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.oib.contains(searchText) ||
-            $0.city.localizedCaseInsensitiveContains(searchText)
+        
+        // Split query into individual words for multi-word matching
+        let words = searchText
+            .split(separator: " ")
+            .map(String.init)
+            .filter { !$0.isEmpty }
+        
+        guard !words.isEmpty else { return clients }
+        
+        return clients.filter { client in
+            // OIB match (exact substring)
+            if client.oib.contains(searchText) { return true }
+            
+            // All words must appear somewhere in name or city (diacritic + case insensitive)
+            let searchable = client.name + " " + client.city
+            return words.allSatisfy { word in
+                searchable.range(of: word, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+            }
         }
     }
     
