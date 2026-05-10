@@ -42,11 +42,16 @@ enum DesignTokens {
     /// Page/canvas backdrop behind the A4 preview
     static let pageBackground = Color(nsColor: .underPageBackgroundColor)
     
-    // Status colors
+    // Status colors (Ponude)
     static let statusDraft = Color(hex: "#94A3B8")
     static let statusSent = Color(hex: "#3B82F6")
     static let statusAccepted = Color(hex: "#22C55E")
     static let statusRejected = Color(hex: "#EF4444")
+    
+    // Status colors (Računi)
+    static let statusIssued = Color(hex: "#8B5CF6")
+    static let statusPaid = Color(hex: "#22C55E")
+    static let statusCancelled = Color(hex: "#EF4444")
 }
 
 // MARK: - Brand Accent Environment Key

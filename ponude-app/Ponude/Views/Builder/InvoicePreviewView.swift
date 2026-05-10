@@ -1,17 +1,19 @@
 import SwiftUI
 
-/// A pixel-perfect A4 paper simulation that renders the quote in real-time,
+/// A pixel-perfect A4 paper simulation that renders the invoice in real-time,
 /// with a distinct visual design per company template style.
-struct QuotePreviewView: View {
+/// Mirrors QuotePreviewView structure but uses "RAČUN" title and invoice-specific metadata.
+struct InvoicePreviewView: View {
     let businessProfile: BusinessProfile
     let client: Client?
-    let ponudaBroj: Int
+    let racunBroj: Int
     let datum: Date
     let mjesto: String
     let stavke: [StavkaEditItem]
     let ukupno: Decimal
     let napomena: String
-    let rokValjanosti: Int
+    let rokPlacanja: Int
+    let sourcePonudaBroj: Int
     
     // A4 at 72dpi: 595 × 842 points
     private let pageWidth: CGFloat = 595
@@ -21,9 +23,18 @@ struct QuotePreviewView: View {
     private var style: QuoteTemplateStyle { .style(for: businessProfile) }
     private var visibleStavke: [StavkaEditItem] { stavke.filter { !$0.naziv.isEmpty } }
     
+    private var formattedBroj: String {
+        let year = Calendar.current.component(.year, from: datum)
+        return "\(racunBroj)/\(year)"
+    }
+    
+    private var rokPlacanjaDate: Date {
+        Calendar.current.date(byAdding: .day, value: rokPlacanja, to: datum) ?? datum
+    }
+    
     var body: some View {
         GeometryReader { geo in
-            let availableWidth = geo.size.width - 24  // account for horizontal padding
+            let availableWidth = geo.size.width - 24
             let scale = min(availableWidth / pageWidth, 1.0)
             
             ScrollView(.vertical, showsIndicators: true) {
@@ -66,7 +77,6 @@ struct QuotePreviewView: View {
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MARK: - LOTUS RC — Cinematic Bold
-    // Dark navy header, white bold outlined brand, modern sans-serif
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     private var lotusPage: some View {
@@ -77,17 +87,14 @@ struct QuotePreviewView: View {
         let ruleLine = Color(hex: "#CBD5E1")
         
         return VStack(spacing: 0) {
-            // ── HEADER: Dark navy with bold brand ──
+            // ── HEADER ──
             ZStack {
                 navy
-                
                 VStack(spacing: 4) {
                     Text(businessProfile.shortName.uppercased())
                         .font(.system(size: 28, weight: .black))
                         .kerning(6)
                         .foregroundStyle(.white)
-                    
-                    // Thin blue accent line under brand
                     Rectangle()
                         .fill(accentBlue)
                         .frame(width: 60, height: 2)
@@ -98,7 +105,7 @@ struct QuotePreviewView: View {
             
             // ── TITLE BAND ──
             VStack(spacing: 0) {
-                Text("PONUDA")
+                Text("RAČUN")
                     .font(.system(size: 28, weight: .bold))
                     .kerning(8)
                     .foregroundStyle(textDark)
@@ -115,10 +122,9 @@ struct QuotePreviewView: View {
                 partiesSection(text: textDark, light: textLight)
                     .padding(.top, 20)
                 
-                metadataSection(text: textDark, light: textLight)
+                invoiceMetadataSection(text: textDark, light: textLight)
                     .padding(.top, 14)
                 
-                // Table header with blue-gray background
                 HStack(spacing: 0) {
                     tableHeaderRow(text: textDark)
                 }
@@ -128,13 +134,9 @@ struct QuotePreviewView: View {
                 .background(Color(hex: "#F1F5F9"))
                 .padding(.top, 12)
                 
-                // Table items
                 tableItemRows(text: textDark, light: textLight, rule: ruleLine)
-                
-                // Totals
                 totalsSection(text: textDark, rule: ruleLine, accent: accentBlue)
-                
-                notesSection(light: textLight)
+                invoiceNotesSection(light: textLight)
                     .padding(.top, 14)
                 
                 Spacer(minLength: 0)
@@ -165,7 +167,6 @@ struct QuotePreviewView: View {
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MARK: - STUDIO VARAŽDIN — Dark Gold Premium
-    // Black header with gold ornamental border, serif fonts, gold accents
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     private var studioPage: some View {
@@ -177,30 +178,23 @@ struct QuotePreviewView: View {
         let ruleLine = Color(hex: "#C5A55A").opacity(0.3)
         
         return VStack(spacing: 0) {
-            // ── HEADER: Black with gold border frame ──
+            // ── HEADER ──
             ZStack {
                 black
-                
-                // Ornamental gold border (inner rectangle frame)
                 RoundedRectangle(cornerRadius: 1)
                     .stroke(gold.opacity(0.4), lineWidth: 0.5)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
                 
-                // Corner ornaments (small L-brackets)
                 ZStack {
-                    // Top-left corner
                     cornerBracket(gold: gold)
                         .position(x: 24, y: 12)
-                    // Top-right corner
                     cornerBracket(gold: gold)
                         .rotationEffect(.degrees(90))
                         .position(x: pageWidth - 24, y: 12)
-                    // Bottom-left corner
                     cornerBracket(gold: gold)
                         .rotationEffect(.degrees(-90))
                         .position(x: 24, y: 58)
-                    // Bottom-right corner
                     cornerBracket(gold: gold)
                         .rotationEffect(.degrees(180))
                         .position(x: pageWidth - 24, y: 58)
@@ -223,7 +217,7 @@ struct QuotePreviewView: View {
             }
             .frame(height: 70)
             
-            // ── TITLE: Gold dividers ──
+            // ── TITLE ──
             VStack(spacing: 0) {
                 Rectangle()
                     .fill(gold)
@@ -231,7 +225,7 @@ struct QuotePreviewView: View {
                     .padding(.horizontal, marginH)
                     .padding(.top, 8)
                 
-                Text("PONUDA")
+                Text("RAČUN")
                     .font(.system(size: 32, weight: .regular, design: .serif))
                     .kerning(6)
                     .foregroundStyle(gold)
@@ -248,7 +242,7 @@ struct QuotePreviewView: View {
                 partiesSection(text: textDark, light: textLight)
                     .padding(.top, 20)
                 
-                metadataSection(text: textDark, light: textLight)
+                invoiceMetadataSection(text: textDark, light: textLight)
                     .padding(.top, 14)
                 
                 Rectangle()
@@ -264,10 +258,8 @@ struct QuotePreviewView: View {
                     .frame(height: 0.5)
                 
                 tableItemRows(text: textDark, light: textLight, rule: ruleLine)
-                
                 totalsSection(text: textDark, rule: ruleLine, accent: gold)
-                
-                notesSection(light: textLight)
+                invoiceNotesSection(light: textLight)
                     .padding(.top, 14)
                 
                 Spacer(minLength: 0)
@@ -276,7 +268,7 @@ struct QuotePreviewView: View {
             
             Spacer(minLength: 0)
             
-            // ── FOOTER: Dark with gold text ──
+            // ── FOOTER ──
             ZStack {
                 black
                 HStack {
@@ -298,7 +290,6 @@ struct QuotePreviewView: View {
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MARK: - LOVEMENTS — Wedding Elegance
-    // Soft blush, rose-gold accents, delicate serif, romantic feel
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     private var lovementsPage: some View {
@@ -310,12 +301,10 @@ struct QuotePreviewView: View {
         let ruleLine = Color(hex: "#F0D4D4")
         
         return VStack(spacing: 0) {
-            // ── HEADER: Soft blush with delicate ornament ──
+            // ── HEADER ──
             ZStack {
                 blush
-                
                 VStack(spacing: 6) {
-                    // Delicate ornamental divider
                     HStack(spacing: 8) {
                         Rectangle().fill(roseGold.opacity(0.4)).frame(width: 40, height: 0.5)
                         Image(systemName: "heart.fill")
@@ -329,7 +318,6 @@ struct QuotePreviewView: View {
                         .kerning(4)
                         .foregroundStyle(roseDark)
                     
-                    // Another ornament
                     HStack(spacing: 8) {
                         Rectangle().fill(roseGold.opacity(0.4)).frame(width: 40, height: 0.5)
                         Image(systemName: "heart.fill")
@@ -342,9 +330,8 @@ struct QuotePreviewView: View {
             }
             .frame(height: 75)
             
-            // ── TITLE: Elegant, thin ──
+            // ── TITLE ──
             VStack(spacing: 0) {
-                // Thin rose-gold line
                 HStack(spacing: 12) {
                     Rectangle().fill(roseGold.opacity(0.3)).frame(height: 0.5)
                     Circle().fill(roseGold.opacity(0.4)).frame(width: 4, height: 4)
@@ -353,7 +340,7 @@ struct QuotePreviewView: View {
                 .padding(.horizontal, marginH + 20)
                 .padding(.top, 6)
                 
-                Text("PONUDA")
+                Text("RAČUN")
                     .font(.system(size: 28, weight: .thin, design: .serif))
                     .kerning(8)
                     .foregroundStyle(roseDark)
@@ -372,7 +359,7 @@ struct QuotePreviewView: View {
                 partiesSection(text: textWarm, light: textLight)
                     .padding(.top, 18)
                 
-                metadataSection(text: textWarm, light: textLight)
+                invoiceMetadataSection(text: textWarm, light: textLight)
                     .padding(.top, 12)
                 
                 Rectangle()
@@ -389,10 +376,8 @@ struct QuotePreviewView: View {
                     .frame(height: 0.5)
                 
                 tableItemRows(text: textWarm, light: textLight, rule: ruleLine)
-                
                 totalsSection(text: textWarm, rule: ruleLine, accent: roseDark)
-                
-                notesSection(light: textLight)
+                invoiceNotesSection(light: textLight)
                     .padding(.top, 12)
                 
                 Spacer(minLength: 0)
@@ -401,15 +386,13 @@ struct QuotePreviewView: View {
             
             Spacer(minLength: 0)
             
-            // ── FOOTER: Blush strip ──
+            // ── FOOTER ──
             ZStack {
                 blush
-                // Delicate line above
                 VStack(spacing: 0) {
                     Rectangle().fill(roseGold.opacity(0.3)).frame(height: 0.5)
                     Spacer()
                 }
-                
                 HStack {
                     if !businessProfile.website.isEmpty {
                         Text(businessProfile.website)
@@ -441,7 +424,7 @@ struct QuotePreviewView: View {
         let ruleLine = Color(hex: "#E5E7EB")
         
         return VStack(spacing: 0) {
-            // ── HEADER: Deep charcoal with violet gradient accent ──
+            // ── HEADER ──
             ZStack {
                 charcoal
                 
@@ -458,7 +441,7 @@ struct QuotePreviewView: View {
                 }
                 .padding(.vertical, 16)
                 
-                // Violet gradient accent bar at the bottom
+                // Violet gradient accent bar
                 VStack {
                     Spacer()
                     LinearGradient(
@@ -472,9 +455,9 @@ struct QuotePreviewView: View {
             }
             .frame(height: 72)
             
-            // ── TITLE BAND ──
+            // ── TITLE ──
             VStack(spacing: 0) {
-                Text("PONUDA")
+                Text("RAČUN")
                     .font(.system(size: 26, weight: .bold))
                     .kerning(10)
                     .foregroundStyle(textDark)
@@ -491,10 +474,9 @@ struct QuotePreviewView: View {
                 partiesSection(text: textDark, light: textLight)
                     .padding(.top, 20)
                 
-                metadataSection(text: textDark, light: textLight)
+                invoiceMetadataSection(text: textDark, light: textLight)
                     .padding(.top, 14)
                 
-                // Table header with subtle violet wash
                 HStack(spacing: 0) {
                     tableHeaderRow(text: textDark)
                 }
@@ -504,13 +486,9 @@ struct QuotePreviewView: View {
                 .background(Color(hex: "#F3F0FF"))
                 .padding(.top, 12)
                 
-                // Table items
                 tableItemRows(text: textDark, light: textLight, rule: ruleLine)
-                
-                // Totals
                 totalsSection(text: textDark, rule: ruleLine, accent: violet)
-                
-                notesSection(light: textLight)
+                invoiceNotesSection(light: textLight)
                     .padding(.top, 14)
                 
                 Spacer(minLength: 0)
@@ -540,7 +518,7 @@ struct QuotePreviewView: View {
     }
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // MARK: - Shared Components (parameterized by color)
+    // MARK: - Shared Components
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
     private func partiesSection(text: Color, light: Color) -> some View {
@@ -621,13 +599,19 @@ struct QuotePreviewView: View {
         }
     }
     
-    private func metadataSection(text: Color, light: Color) -> some View {
+    /// Invoice-specific metadata section with payment deadline and ponuda reference
+    private func invoiceMetadataSection(text: Color, light: Color) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            metadataLine("Broj:", "\(ponudaBroj)", text: text, light: light)
+            metadataLine("Broj računa:", formattedBroj, text: text, light: light)
             if !mjesto.isEmpty {
                 metadataLine("Mjesto:", mjesto, text: text, light: light)
             }
-            metadataLine("Datum:", datum.hrFormatted, text: text, light: light)
+            metadataLine("Datum izdavanja:", datum.hrFormatted, text: text, light: light)
+            metadataLine("Rok plaćanja:", rokPlacanjaDate.hrFormatted, text: text, light: light)
+            
+            if sourcePonudaBroj > 0 {
+                metadataLine("Temeljem ponude br.:", "\(sourcePonudaBroj)", text: text, light: light)
+            }
         }
     }
     
@@ -757,14 +741,21 @@ struct QuotePreviewView: View {
         }
     }
     
-    private func notesSection(light: Color) -> some View {
+    /// Invoice-specific notes section with IBAN payment info
+    private func invoiceNotesSection(light: Color) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(businessProfile.vatExemptNote.isEmpty ? "oslobođen PDV-a" : businessProfile.vatExemptNote)
                 .font(.system(size: 8))
                 .foregroundStyle(light)
             
-            if rokValjanosti > 0 {
-                Text("Rok valjanosti: \(rokValjanosti) dana")
+            if !businessProfile.iban.isEmpty {
+                Text("Plaćanje na IBAN: \(businessProfile.iban)")
+                    .font(.system(size: 8, weight: .medium))
+                    .foregroundStyle(light)
+            }
+            
+            if sourcePonudaBroj > 0 {
+                Text("Temeljem ponude br. \(sourcePonudaBroj)")
                     .font(.system(size: 8))
                     .foregroundStyle(light)
             }
@@ -790,7 +781,6 @@ struct QuotePreviewView: View {
         return (nil, name)
     }
     
-    /// Corner bracket ornament for Studio Varaždin header
     private func cornerBracket(gold: Color) -> some View {
         ZStack {
             Path { path in
@@ -804,35 +794,69 @@ struct QuotePreviewView: View {
     }
 }
 
-// MARK: - Preview Provider
+// MARK: - Debounced Invoice Preview Wrapper
 
-#Preview {
-    let profile = BusinessProfile(
-        name: "Lotus RC, vl. Timon Terzić",
-        shortName: "Lotus RC",
-        ownerName: "Timon Terzić",
-        oib: "58278708852",
-        phone: "+385 99 123 4567",
-        email: "info@lotusrc.hr",
-        website: "www.lotusrc.hr",
-        isDefault: true
-    )
+/// Wraps `InvoicePreviewView` with a 300ms debounce so the heavy A4 preview
+/// doesn't re-render on every keystroke — only after the user pauses typing.
+struct DebouncedInvoicePreviewWrapper: View {
+    let businessProfile: BusinessProfile
+    let state: InvoiceBuilderState
+    let invoiceNumber: Int
     
-    let stavke = [
-        StavkaEditItem(naziv: "Digitalno snimanje, Špancirfest 2026.", opis: "Profesionalno snimanje festivala", kolicina: "1", cijena: "30000"),
-    ]
+    @State private var snapshotClient: Client?
+    @State private var snapshotBroj: Int = 0
+    @State private var snapshotDatum: Date = Date()
+    @State private var snapshotMjesto: String = ""
+    @State private var snapshotStavke: [StavkaEditItem] = []
+    @State private var snapshotUkupno: Decimal = 0
+    @State private var snapshotNapomena: String = ""
+    @State private var snapshotRok: Int = 15
+    @State private var snapshotSourcePonuda: Int = 0
+    @State private var debounceTask: Task<Void, Never>?
+    @State private var hasInitialized = false
     
-    QuotePreviewView(
-        businessProfile: profile,
-        client: nil,
-        ponudaBroj: 4,
-        datum: Date(),
-        mjesto: "Varaždinske Toplice",
-        stavke: stavke,
-        ukupno: 30000,
-        napomena: "",
-        rokValjanosti: 30
-    )
-    .frame(width: 500, height: 700)
-    .padding()
+    var body: some View {
+        InvoicePreviewView(
+            businessProfile: businessProfile,
+            client: snapshotClient,
+            racunBroj: snapshotBroj,
+            datum: snapshotDatum,
+            mjesto: snapshotMjesto,
+            stavke: snapshotStavke,
+            ukupno: snapshotUkupno,
+            napomena: snapshotNapomena,
+            rokPlacanja: snapshotRok,
+            sourcePonudaBroj: snapshotSourcePonuda
+        )
+        .onAppear {
+            if !hasInitialized {
+                takeSnapshot()
+                hasInitialized = true
+            }
+        }
+        .onChange(of: state.changeToken) {
+            scheduleSnapshot()
+        }
+    }
+    
+    private func scheduleSnapshot() {
+        debounceTask?.cancel()
+        debounceTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+            takeSnapshot()
+        }
+    }
+    
+    private func takeSnapshot() {
+        snapshotClient = state.selectedClient
+        snapshotBroj = invoiceNumber
+        snapshotDatum = state.datum
+        snapshotMjesto = state.mjesto
+        snapshotStavke = state.stavke
+        snapshotUkupno = state.ukupno
+        snapshotNapomena = state.napomena
+        snapshotRok = state.rokPlacanjaDays
+        snapshotSourcePonuda = state.sourcePonudaBroj
+    }
 }

@@ -1,24 +1,23 @@
 import SwiftUI
 import SwiftData
 
-/// Dashboard showing a list of quotes with stats cards and search/filter.
-struct DashboardView: View {
+/// Dashboard showing a list of invoices with stats cards and search/filter.
+struct InvoiceDashboardView: View {
     let selectedProfile: BusinessProfile?
-    let onNewQuote: () -> Void
-    let onEditQuote: (Ponuda) -> Void
-    let onCreateInvoice: (Ponuda) -> Void
+    let onNewInvoice: () -> Void
+    let onEditInvoice: (Racun) -> Void
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.brandAccent) private var brandAccent
-    @Query(sort: \Ponuda.datum, order: .reverse) private var allPonude: [Ponuda]
+    @Query(sort: \Racun.datum, order: .reverse) private var allRacuni: [Racun]
     
     @State private var searchText = ""
-    @State private var statusFilter: PonudaStatus? = nil
-    @State private var deleteTarget: Ponuda? = nil
+    @State private var statusFilter: RacunStatus? = nil
+    @State private var deleteTarget: Racun? = nil
     @State private var showDeleteAlert = false
     
-    private var filteredPonude: [Ponuda] {
-        var result = allPonude
+    private var filteredRacuni: [Racun] {
+        var result = allRacuni
         
         // Filter by selected business profile
         if let profile = selectedProfile {
@@ -32,54 +31,45 @@ struct DashboardView: View {
         
         // Filter by search text
         if !searchText.isEmpty {
-            result = result.filter { ponuda in
-                ponuda.client?.name.localizedCaseInsensitiveContains(searchText) == true ||
-                "\(ponuda.broj)".contains(searchText) ||
-                ponuda.mjesto.localizedCaseInsensitiveContains(searchText)
+            result = result.filter { racun in
+                racun.client?.name.localizedCaseInsensitiveContains(searchText) == true ||
+                "\(racun.broj)".contains(searchText) ||
+                racun.mjesto.localizedCaseInsensitiveContains(searchText)
             }
         }
         
         return result
     }
     
-    // MARK: - Stats (always based on profile-level data, not status filter)
+    // MARK: - Stats
     
-    /// All ponude for the selected profile, independent of status/search filters.
-    private var profilePonude: [Ponuda] {
-        guard let profile = selectedProfile else { return allPonude }
-        return allPonude.filter { $0.businessProfile?.id == profile.id }
+    private var profileRacuni: [Racun] {
+        guard let profile = selectedProfile else { return allRacuni }
+        return allRacuni.filter { $0.businessProfile?.id == profile.id }
     }
     
-    private var totalCount: Int { profilePonude.count }
-    private var draftCount: Int { profilePonude.filter { $0.status == .nacrt }.count }
-    private var sentCount: Int { profilePonude.filter { $0.status == .poslano }.count }
-    private var acceptedCount: Int { profilePonude.filter { $0.status == .prihvaceno }.count }
-    private var totalValue: Decimal { profilePonude.reduce(Decimal.zero) { $0 + $1.ukupno } }
+    private var totalCount: Int { profileRacuni.count }
+    private var draftCount: Int { profileRacuni.filter { $0.status == .nacrt }.count }
+    private var issuedCount: Int { profileRacuni.filter { $0.status == .izdano }.count }
+    private var paidCount: Int { profileRacuni.filter { $0.status == .placeno }.count }
+    private var totalValue: Decimal { profileRacuni.reduce(Decimal.zero) { $0 + $1.ukupno } }
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header
             header
-            
             Divider()
-            
-            // Stats cards
             statsCards
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
             
-            
-
-            
-            // Quote list
-            if filteredPonude.isEmpty {
+            if filteredRacuni.isEmpty {
                 emptyState
             } else {
-                quoteList
+                invoiceList
             }
         }
         .background(Color(nsColor: .controlBackgroundColor))
-        .alert("Obriši ponudu?", isPresented: $showDeleteAlert) {
+        .alert("Obriši račun?", isPresented: $showDeleteAlert) {
             Button("Obriši", role: .destructive) {
                 if let target = deleteTarget {
                     modelContext.delete(target)
@@ -89,7 +79,7 @@ struct DashboardView: View {
             Button("Odustani", role: .cancel) { }
         } message: {
             if let target = deleteTarget {
-                Text("Jeste li sigurni da želite obrisati ponudu #\(target.broj)?")
+                Text("Jeste li sigurni da želite obrisati račun #\(target.broj)?")
             }
         }
     }
@@ -99,7 +89,7 @@ struct DashboardView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Ponude")
+                Text("Računi")
                     .font(.system(size: 28, weight: .bold))
                 if let profile = selectedProfile {
                     Text(profile.shortName)
@@ -111,7 +101,6 @@ struct DashboardView: View {
             Spacer()
             
             HStack(spacing: 12) {
-                // Search field
                 HStack(spacing: 6) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
@@ -123,8 +112,8 @@ struct DashboardView: View {
                 .padding(.vertical, 6)
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
                 
-                Button(action: onNewQuote) {
-                    Label("Nova ponuda", systemImage: "plus")
+                Button(action: onNewInvoice) {
+                    Label("Novi račun", systemImage: "plus")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(brandAccent)
@@ -138,31 +127,30 @@ struct DashboardView: View {
     
     private var statsCards: some View {
         HStack(spacing: 14) {
-            StatCard(title: "Ukupna vrijednost", value: "\(totalValue.hrFormatted) €", icon: "eurosign.circle.fill", color: brandAccent, isActive: false, onTap: nil)
-            StatCard(title: "Ukupno ponuda", value: "\(totalCount)", icon: "doc.text.fill", color: .blue, isActive: statusFilter == nil) {
+            StatCard(title: "Ukupno fakturirano", value: "\(totalValue.hrFormatted) €", icon: "eurosign.circle.fill", color: brandAccent, isActive: false, onTap: nil)
+            StatCard(title: "Ukupno računa", value: "\(totalCount)", icon: "doc.text.fill", color: .blue, isActive: statusFilter == nil) {
                 withAnimation(.easeInOut(duration: 0.2)) { statusFilter = nil }
             }
             StatCard(title: "U izradi", value: "\(draftCount)", icon: "doc.badge.ellipsis", color: DesignTokens.statusDraft, isActive: statusFilter == .nacrt) {
                 withAnimation(.easeInOut(duration: 0.2)) { statusFilter = statusFilter == .nacrt ? nil : .nacrt }
             }
-            StatCard(title: "Poslano", value: "\(sentCount)", icon: "paperplane.fill", color: DesignTokens.statusSent, isActive: statusFilter == .poslano) {
-                withAnimation(.easeInOut(duration: 0.2)) { statusFilter = statusFilter == .poslano ? nil : .poslano }
+            StatCard(title: "Izdano", value: "\(issuedCount)", icon: "paperplane.fill", color: DesignTokens.statusIssued, isActive: statusFilter == .izdano) {
+                withAnimation(.easeInOut(duration: 0.2)) { statusFilter = statusFilter == .izdano ? nil : .izdano }
             }
-            StatCard(title: "Prihvaćeno", value: "\(acceptedCount)", icon: "checkmark.seal.fill", color: DesignTokens.statusAccepted, isActive: statusFilter == .prihvaceno) {
-                withAnimation(.easeInOut(duration: 0.2)) { statusFilter = statusFilter == .prihvaceno ? nil : .prihvaceno }
+            StatCard(title: "Plaćeno", value: "\(paidCount)", icon: "checkmark.seal.fill", color: DesignTokens.statusPaid, isActive: statusFilter == .placeno) {
+                withAnimation(.easeInOut(duration: 0.2)) { statusFilter = statusFilter == .placeno ? nil : .placeno }
             }
         }
     }
-
     
-    // MARK: - Quote List
+    // MARK: - Invoice List
     
-    private var quoteList: some View {
+    private var invoiceList: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 // Table header
                 HStack {
-                    Text("#").frame(width: 50, alignment: .leading)
+                    Text("#").frame(width: 70, alignment: .leading)
                     Text("Klijent").frame(minWidth: 200, alignment: .leading)
                     Text("Datum").frame(width: 100, alignment: .leading)
                     Text("Iznos").frame(width: 120, alignment: .trailing)
@@ -177,15 +165,12 @@ struct DashboardView: View {
                 
                 Divider()
                 
-                ForEach(filteredPonude) { ponuda in
-                    QuoteRow(ponuda: ponuda,
-                             onEdit: { onEditQuote(ponuda) },
-                             onDelete: {
-                        deleteTarget = ponuda
+                ForEach(filteredRacuni) { racun in
+                    InvoiceRow(racun: racun,
+                               onEdit: { onEditInvoice(racun) },
+                               onDelete: {
+                        deleteTarget = racun
                         showDeleteAlert = true
-                    },
-                             onCreateInvoice: {
-                        onCreateInvoice(ponuda)
                     })
                 }
             }
@@ -204,14 +189,15 @@ struct DashboardView: View {
             Image(systemName: "doc.text.magnifyingglass")
                 .font(.system(size: 48))
                 .foregroundStyle(.quaternary)
-            Text("Nema ponuda")
+            Text("Nema računa")
                 .font(.title2)
                 .foregroundStyle(.secondary)
-            Text("Kreirajte novu ponudu klikom na gumb \"Nova ponuda\".")
+            Text("Kreirajte novi račun klikom na gumb \"Novi račun\" ili iz prihvaćene ponude.")
                 .font(.body)
                 .foregroundStyle(.tertiary)
-            Button(action: onNewQuote) {
-                Label("Kreiraj prvu ponudu", systemImage: "plus")
+                .multilineTextAlignment(.center)
+            Button(action: onNewInvoice) {
+                Label("Kreiraj prvi račun", systemImage: "plus")
             }
             .buttonStyle(.borderedProminent)
             .tint(brandAccent)
@@ -220,68 +206,12 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - Supporting Views
+// MARK: - Invoice Row
 
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-    var isActive: Bool = false
-    var onTap: (() -> Void)? = nil
-    
-    @State private var isHovered = false
-    
-    private var isClickable: Bool { onTap != nil }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 16))
-                    .foregroundStyle(color)
-                Spacer()
-            }
-            Text(value)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(Color(nsColor: .labelColor))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            Text(title)
-                .font(.system(size: 11))
-                .foregroundColor(Color(nsColor: .secondaryLabelColor))
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, minHeight: 90, alignment: .leading)
-        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    isActive ? color : (isHovered && isClickable ? color.opacity(0.4) : Color(nsColor: .separatorColor).opacity(0.5)),
-                    lineWidth: isActive ? 1.5 : 0.5
-                )
-        )
-        .shadow(color: isActive ? color.opacity(0.15) : .black.opacity(0.06), radius: isActive ? 8 : 6, y: 2)
-        .scaleEffect(isHovered && isClickable ? 1.02 : 1.0)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap?()
-        }
-        .onHover { hovering in
-            guard isClickable else { return }
-            withAnimation(.easeInOut(duration: 0.15)) {
-                isHovered = hovering
-            }
-        }
-    }
-}
-
-
-struct QuoteRow: View {
-    let ponuda: Ponuda
+struct InvoiceRow: View {
+    let racun: Racun
     let onEdit: () -> Void
     let onDelete: () -> Void
-    let onCreateInvoice: () -> Void
     
     @Environment(\.modelContext) private var modelContext
     @State private var isHovered = false
@@ -289,60 +219,72 @@ struct QuoteRow: View {
     
     var body: some View {
         HStack {
-            Text("\(ponuda.broj)")
+            Text(racun.formattedBroj)
                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
+                .frame(width: 70, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(ponuda.client?.name ?? "Bez klijenta")
+                Text(racun.client?.name ?? "Bez klijenta")
                     .font(.system(size: 13, weight: .medium))
                     .lineLimit(1)
-                if let mjesto = ponuda.mjesto.isEmpty ? nil : ponuda.mjesto {
-                    Text(mjesto)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                
+                HStack(spacing: 8) {
+                    if let mjesto = racun.mjesto.isEmpty ? nil : racun.mjesto {
+                        Text(mjesto)
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    if racun.hasSourcePonuda {
+                        HStack(spacing: 2) {
+                            Image(systemName: "link")
+                                .font(.system(size: 8))
+                            Text("P#\(racun.sourcePonudaBroj)")
+                                .font(.system(size: 10, weight: .medium))
+                        }
+                        .foregroundStyle(DesignTokens.statusSent.opacity(0.7))
+                    }
                 }
             }
             .frame(minWidth: 200, alignment: .leading)
             
-            Text(ponuda.datum.hrFormatted)
+            Text(racun.datum.hrFormatted)
                 .font(.system(size: 12, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .frame(width: 100, alignment: .leading)
             
-            Text("\(ponuda.formattedUkupno) €")
+            Text("\(racun.formattedUkupno) €")
                 .font(.system(size: 13, weight: .semibold, design: .monospaced))
                 .frame(width: 120, alignment: .trailing)
             
-            // Status badge — clickable dropdown to change status
+            // Status badge — clickable dropdown
             Menu {
-                ForEach(PonudaStatus.allCases, id: \.self) { status in
+                ForEach(RacunStatus.allCases, id: \.self) { status in
                     Button {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            ponuda.status = status
-                            ponuda.updatedAt = Date()
+                            racun.status = status
+                            racun.updatedAt = Date()
                             try? modelContext.save()
                         }
                     } label: {
                         Label(status.rawValue, systemImage: status.icon)
                     }
-                    .disabled(ponuda.status == status)
+                    .disabled(racun.status == status)
                 }
             } label: {
                 HStack(spacing: 4) {
-                    Image(systemName: ponuda.status.icon)
+                    Image(systemName: racun.status.icon)
                         .font(.system(size: 10))
-                    Text(ponuda.status.rawValue)
+                    Text(racun.status.rawValue)
                         .font(.system(size: 11, weight: .medium))
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 8, weight: .semibold))
                         .opacity(isStatusHovered ? 1 : 0.4)
                 }
-                .foregroundStyle(Color(hex: ponuda.status.color))
+                .foregroundStyle(Color(hex: racun.status.color))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background(Color(hex: ponuda.status.color).opacity(isStatusHovered ? 0.18 : 0.1), in: Capsule())
+                .background(Color(hex: racun.status.color).opacity(isStatusHovered ? 0.18 : 0.1), in: Capsule())
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
@@ -371,30 +313,6 @@ struct QuoteRow: View {
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.15)) {
                 isHovered = hovering
-            }
-        }
-        .contextMenu {
-            Button {
-                onEdit()
-            } label: {
-                Label("Uredi ponudu", systemImage: "pencil")
-            }
-            
-            if ponuda.status == .prihvaceno {
-                Divider()
-                Button {
-                    onCreateInvoice()
-                } label: {
-                    Label("Kreiraj račun", systemImage: "doc.text.badge.plus")
-                }
-            }
-            
-            Divider()
-            
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label("Obriši", systemImage: "trash")
             }
         }
         

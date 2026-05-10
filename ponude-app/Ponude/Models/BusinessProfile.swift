@@ -35,6 +35,9 @@ final class BusinessProfile {
     @Relationship(deleteRule: .cascade, inverse: \Ponuda.businessProfile)
     var ponude: [Ponuda] = []
     
+    @Relationship(deleteRule: .cascade, inverse: \Racun.businessProfile)
+    var racuni: [Racun] = []
+    
     var taxStatus: TaxStatus {
         get { TaxStatus(rawValue: taxStatusRaw) ?? .pausalnObrt }
         set { taxStatusRaw = newValue.rawValue }

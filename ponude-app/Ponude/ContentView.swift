@@ -9,6 +9,8 @@ struct ContentView: View {
     @State private var selectedNav: NavItem = .dashboard
     @State private var selectedProfile: BusinessProfile?
     @State private var editingPonuda: Ponuda?
+    @State private var editingRacun: Racun?
+    @State private var sourcePonuda: Ponuda?
     @State private var showProfileSwitcher = false
     @State private var profileToDelete: BusinessProfile?
     
@@ -16,6 +18,8 @@ struct ContentView: View {
         case dashboard
         case clients
         case newQuote
+        case racuni
+        case newRacun
         case addCompany
     }
     
@@ -91,6 +95,9 @@ struct ContentView: View {
                     Label("Ponude", systemImage: "doc.text.fill")
                         .tag(NavItem.dashboard)
                     
+                    Label("Računi", systemImage: "banknote.fill")
+                        .tag(NavItem.racuni)
+                    
                     Label("Klijenti", systemImage: "person.2.fill")
                         .tag(NavItem.clients)
                 } header: {
@@ -134,6 +141,11 @@ struct ContentView: View {
                 onEditQuote: { ponuda in
                     editingPonuda = ponuda
                     selectedNav = .newQuote
+                },
+                onCreateInvoice: { ponuda in
+                    sourcePonuda = ponuda
+                    editingRacun = nil
+                    selectedNav = .newRacun
                 }
             )
             
@@ -152,11 +164,39 @@ struct ContentView: View {
                 )
                 .id(editingPonuda?.persistentModelID ?? profile.persistentModelID)
             } else {
-                ContentUnavailableView(
-                    "Nema aktivne tvrtke",
-                    systemImage: "building.2",
-                    description: Text("Dodajte poslovni profil u Postavkama kako biste mogli kreirati ponude.")
+                noProfileView
+            }
+            
+        case .racuni:
+            InvoiceDashboardView(
+                selectedProfile: selectedProfile,
+                onNewInvoice: {
+                    editingRacun = nil
+                    sourcePonuda = nil
+                    selectedNav = .newRacun
+                },
+                onEditInvoice: { racun in
+                    editingRacun = racun
+                    sourcePonuda = nil
+                    selectedNav = .newRacun
+                }
+            )
+            
+        case .newRacun:
+            if let profile = selectedProfile {
+                InvoiceBuilderView(
+                    businessProfile: profile,
+                    existingRacun: editingRacun,
+                    sourcePonuda: sourcePonuda,
+                    onDismiss: {
+                        editingRacun = nil
+                        sourcePonuda = nil
+                        selectedNav = .racuni
+                    }
                 )
+                .id(editingRacun?.persistentModelID ?? sourcePonuda?.persistentModelID ?? profile.persistentModelID)
+            } else {
+                noProfileView
             }
             
         case .addCompany:
@@ -165,6 +205,14 @@ struct ContentView: View {
                 selectedNav = .dashboard
             }
         }
+    }
+    
+    private var noProfileView: some View {
+        ContentUnavailableView(
+            "Nema aktivne tvrtke",
+            systemImage: "building.2",
+            description: Text("Dodajte poslovni profil u Postavkama kako biste mogli kreirati dokumente.")
+        )
     }
     
     // MARK: - Profile Switcher Popover
@@ -372,6 +420,22 @@ struct ContentView: View {
                 website: "",
                 vatExemptNote: "Oslobođeno PDV-a temeljem članka 90. st. 2 Zakona o PDV-u.",
                 brandColorHex: "#E54F71",
+                isDefault: false
+            ),
+            ProfileData(
+                name: "DOMY MEDIA, obrt za videoprodukciju i usluge, vl. Dorian Domiter",
+                shortName: "Domy Media",
+                ownerName: "Dorian Domiter",
+                oib: "02942763384",
+                iban: "",
+                address: "Gajeva ulica 2",
+                city: "Trnovec",
+                zipCode: "42202",
+                phone: "",
+                email: "",
+                website: "",
+                vatExemptNote: "Oslobođeno PDV-a temeljem članka 90. st. 2 Zakona o PDV-u.",
+                brandColorHex: "#7B2FF7",
                 isDefault: false
             ),
         ]

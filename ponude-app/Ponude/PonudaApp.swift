@@ -14,7 +14,9 @@ struct PonudaApp: App {
             BusinessProfile.self,
             Client.self,
             Ponuda.self,
-            PonudaStavka.self
+            PonudaStavka.self,
+            Racun.self,
+            RacunStavka.self
         ])
         .defaultSize(width: 1280, height: 800)
         .commands {

@@ -21,6 +21,9 @@ final class Client {
     @Relationship(deleteRule: .nullify, inverse: \Ponuda.client)
     var ponude: [Ponuda] = []
     
+    @Relationship(deleteRule: .nullify, inverse: \Racun.client)
+    var racuni: [Racun] = []
+    
     var fullAddress: String {
         var parts: [String] = []
         if !address.isEmpty { parts.append(address) }

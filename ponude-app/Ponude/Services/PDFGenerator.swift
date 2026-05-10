@@ -195,7 +195,608 @@ final class PDFGenerator: NSObject {
                 stavke: stavke, ukupno: ukupno, napomena: napomena,
                 rokValjanosti: rokValjanosti, logoBase64: logoBase64
             )
+        case .domyMedia:
+            return generateDomyHTML(
+                businessProfile: businessProfile, client: client,
+                ponudaBroj: ponudaBroj, datum: datum, mjesto: mjesto,
+                stavke: stavke, ukupno: ukupno, napomena: napomena,
+                rokValjanosti: rokValjanosti, logoBase64: logoBase64
+            )
         }
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - INVOICE EXPORT
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    /// Export an invoice as a PDF, presenting a save dialog to the user.
+    func exportInvoice(
+        businessProfile: BusinessProfile,
+        client: Client?,
+        racunBroj: Int,
+        datum: Date,
+        mjesto: String,
+        stavke: [StavkaEditItem],
+        ukupno: Decimal,
+        napomena: String,
+        rokPlacanja: Int,
+        sourcePonudaBroj: Int
+    ) {
+        let html = generateInvoiceHTML(
+            businessProfile: businessProfile,
+            client: client,
+            racunBroj: racunBroj,
+            datum: datum,
+            mjesto: mjesto,
+            stavke: stavke,
+            ukupno: ukupno,
+            napomena: napomena,
+            rokPlacanja: rokPlacanja,
+            sourcePonudaBroj: sourcePonudaBroj
+        )
+        
+        // Create save panel
+        let panel = NSSavePanel()
+        let dateStr = {
+            let f = DateFormatter()
+            f.dateFormat = "yyyyMMdd_HHmmss"
+            return f.string(from: Date())
+        }()
+        let year = Calendar.current.component(.year, from: datum)
+        panel.nameFieldStringValue = "\(racunBroj)-\(year)-Racun_\(dateStr).pdf"
+        panel.allowedContentTypes = [.pdf]
+        panel.canCreateDirectories = true
+        panel.title = "Spremi račun kao PDF"
+        
+        PDFGenerator.activeGenerators.insert(self)
+        
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else {
+                PDFGenerator.activeGenerators.remove(self)
+                return
+            }
+            DispatchQueue.main.async {
+                self.renderHTMLtoPDF(html: html, outputURL: url)
+            }
+        }
+    }
+    
+    // MARK: - Invoice HTML Generation
+    
+    private func generateInvoiceHTML(
+        businessProfile: BusinessProfile,
+        client: Client?,
+        racunBroj: Int,
+        datum: Date,
+        mjesto: String,
+        stavke: [StavkaEditItem],
+        ukupno: Decimal,
+        napomena: String,
+        rokPlacanja: Int,
+        sourcePonudaBroj: Int
+    ) -> String {
+        let style = QuoteTemplateStyle.style(for: businessProfile)
+        let logoBase64 = loadLogoBase64(for: style, businessProfile: businessProfile)
+        
+        // Build invoice-specific metadata and notes
+        let year = Calendar.current.component(.year, from: datum)
+        let formattedBroj = "\(racunBroj)/\(year)"
+        let rokDate = Calendar.current.date(byAdding: .day, value: rokPlacanja, to: datum) ?? datum
+        let rokDateFormatted = rokDate.hrFormatted
+        
+        let invoiceMetadataHTML = buildInvoiceMetadataHTML(
+            formattedBroj: formattedBroj,
+            mjesto: mjesto,
+            datum: datum,
+            rokDateFormatted: rokDateFormatted,
+            sourcePonudaBroj: sourcePonudaBroj
+        )
+        
+        let invoiceNotesHTML = buildInvoiceNotesHTML(
+            businessProfile: businessProfile,
+            napomena: napomena,
+            sourcePonudaBroj: sourcePonudaBroj
+        )
+        
+        let tableRows = buildTableRows(stavke: stavke)
+        let clientHTML = buildClientHTML(client: client)
+        
+        // Use the same HTML template structure as quotes but with RAČUN title and invoice metadata
+        switch style {
+        case .lotusRC:
+            return generateLotusInvoiceHTML(
+                businessProfile: businessProfile, clientHTML: clientHTML,
+                tableRows: tableRows, ukupno: ukupno,
+                invoiceMetadataHTML: invoiceMetadataHTML,
+                invoiceNotesHTML: invoiceNotesHTML, logoBase64: logoBase64
+            )
+        case .studioVarazdin:
+            return generateStudioInvoiceHTML(
+                businessProfile: businessProfile, clientHTML: clientHTML,
+                tableRows: tableRows, ukupno: ukupno,
+                invoiceMetadataHTML: invoiceMetadataHTML,
+                invoiceNotesHTML: invoiceNotesHTML, logoBase64: logoBase64
+            )
+        case .lovements:
+            return generateLovementsInvoiceHTML(
+                businessProfile: businessProfile, clientHTML: clientHTML,
+                tableRows: tableRows, ukupno: ukupno,
+                invoiceMetadataHTML: invoiceMetadataHTML,
+                invoiceNotesHTML: invoiceNotesHTML, logoBase64: logoBase64
+            )
+        case .domyMedia:
+            return generateDomyInvoiceHTML(
+                businessProfile: businessProfile, clientHTML: clientHTML,
+                tableRows: tableRows, ukupno: ukupno,
+                invoiceMetadataHTML: invoiceMetadataHTML,
+                invoiceNotesHTML: invoiceNotesHTML, logoBase64: logoBase64
+            )
+        }
+    }
+    
+    private func buildInvoiceMetadataHTML(
+        formattedBroj: String,
+        mjesto: String,
+        datum: Date,
+        rokDateFormatted: String,
+        sourcePonudaBroj: Int
+    ) -> String {
+        var html = """
+            <span class="label">Broj računa:</span> <span class="value">\(escapeHTML(formattedBroj))</span><br>
+        """
+        if !mjesto.isEmpty {
+            html += """
+                <span class="label">Mjesto:</span> <span class="value">\(escapeHTML(mjesto))</span><br>
+            """
+        }
+        html += """
+            <span class="label">Datum izdavanja:</span> <span class="value">\(datum.hrFormatted)</span><br>
+            <span class="label">Rok plaćanja:</span> <span class="value">\(rokDateFormatted)</span>
+        """
+        if sourcePonudaBroj > 0 {
+            html += """
+                <br><span class="label">Temeljem ponude br.:</span> <span class="value">\(sourcePonudaBroj)</span>
+            """
+        }
+        return html
+    }
+    
+    private func buildInvoiceNotesHTML(
+        businessProfile: BusinessProfile,
+        napomena: String,
+        sourcePonudaBroj: Int
+    ) -> String {
+        var html = "<p>\(escapeHTML(businessProfile.vatExemptNote.isEmpty ? "oslobođen PDV-a" : businessProfile.vatExemptNote))</p>"
+        if !businessProfile.iban.isEmpty {
+            html += "<p style=\"font-weight: 500;\">Plaćanje na IBAN: \(escapeHTML(businessProfile.iban))</p>"
+        }
+        if sourcePonudaBroj > 0 {
+            html += "<p>Temeljem ponude br. \(sourcePonudaBroj)</p>"
+        }
+        if !napomena.isEmpty {
+            html += "<p>\(escapeHTML(napomena))</p>"
+        }
+        return html
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - LOTUS RC Invoice HTML
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    private func generateLotusInvoiceHTML(
+        businessProfile: BusinessProfile,
+        clientHTML: String,
+        tableRows: String,
+        ukupno: Decimal,
+        invoiceMetadataHTML: String,
+        invoiceNotesHTML: String,
+        logoBase64: String?
+    ) -> String {
+        return """
+        <!DOCTYPE html>
+        <html lang="hr">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page { size: A4; margin: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E293B; width: 595px; height: 842px; position: relative; background: #FFFFFF; }
+                .header { background: #0B1929; text-align: center; padding: 14px 48px; }
+                .header-logo { max-width: 380px; max-height: 50px; display: block; margin: 0 auto; object-fit: contain; }
+                .brand-name { font-size: 28px; font-weight: 900; letter-spacing: 6px; color: #FFFFFF; text-transform: uppercase; }
+                .brand-accent { width: 60px; height: 2px; background: #3B82F6; margin: 6px auto 0; }
+                .title-band { text-align: center; padding: 12px 48px 0; }
+                .title-text { font-size: 28px; font-weight: 700; letter-spacing: 8px; color: #1E293B; padding: 12px 0; }
+                .title-line { height: 2px; background: #3B82F6; margin: 0; }
+                .content { padding: 20px 48px 0; }
+                .parties { display: flex; gap: 30px; margin-bottom: 14px; }
+                .party { flex: 1; font-size: 9px; line-height: 1.6; color: #64748B; }
+                .party strong { color: #1E293B; display: block; margin-bottom: 2px; }
+                .metadata { font-size: 9px; line-height: 1.8; color: #64748B; margin-bottom: 12px; }
+                .metadata .value { color: #1E293B; font-weight: 500; }
+                table { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+                thead th { text-align: left; font-weight: 700; font-size: 9px; color: #1E293B; padding: 8px 6px; background: #F1F5F9; }
+                thead th:first-child { padding-left: 0; } thead th:last-child { padding-right: 0; }
+                thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+                tbody td { padding: 7px 6px; vertical-align: top; border-bottom: 0.3px solid #CBD5E1; color: #1E293B; font-size: 9px; }
+                tbody td:first-child { padding-left: 0; } tbody td:last-child { padding-right: 0; }
+                .text-right { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 9px; white-space: nowrap; }
+                .font-bold { font-weight: 600; }
+                .item-name { word-wrap: break-word; overflow-wrap: break-word; }
+                .item-description-label { font-size: 7.5px; color: #94A3B8; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+                .item-description { font-size: 8px; color: #94A3B8; margin-top: 2px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; }
+                .totals { margin-top: 0; }
+                .total-row { display: flex; justify-content: flex-end; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #CBD5E1; font-size: 10px; }
+                .total-row.main { font-weight: 800; font-size: 11px; }
+                .total-row.main .total-value { color: #3B82F6; }
+                .total-label { font-weight: 700; color: #1E293B; margin-right: 12px; }
+                .total-value { font-family: 'SF Mono', 'Menlo', monospace; color: #1E293B; min-width: 100px; text-align: right; }
+                .notes { margin-top: 14px; font-size: 8.5px; color: #64748B; line-height: 1.6; }
+                .notes p { margin-bottom: 4px; }
+                .footer { position: absolute; bottom: 0; left: 0; right: 0; background: #0B1929; display: flex; justify-content: space-between; padding: 9px 48px; font-size: 8.5px; color: rgba(255,255,255,0.6); }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                \(logoBase64 != nil ? "<img class=\"header-logo\" src=\"\(logoBase64!)\" alt=\"\(escapeHTML(businessProfile.shortName))\">" : "<div class=\"brand-name\">\(escapeHTML(businessProfile.shortName))</div><div class=\"brand-accent\"></div>")
+            </div>
+            <div class="title-band">
+                <div class="title-text">RAČUN</div>
+                <div class="title-line"></div>
+            </div>
+            <div class="content">
+                <div class="parties">
+                    <div class="party">
+                        <strong>\(escapeHTML(businessProfile.name))</strong>
+                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(escapeHTML(businessProfile.fullAddress))<br>
+                        \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
+                        \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
+                        \(!businessProfile.phone.isEmpty ? "Tel.: \(escapeHTML(businessProfile.phone))<br>" : "")
+                        \(!businessProfile.email.isEmpty ? "E-mail: \(escapeHTML(businessProfile.email))" : "")
+                    </div>
+                    <div class="party">
+                        \(clientHTML)
+                    </div>
+                </div>
+                <div class="metadata">
+                    \(invoiceMetadataHTML)
+                </div>
+                <table>
+                    <colgroup><col style="width: 55%"><col style="width: 12%"><col style="width: 15%"><col style="width: 18%"></colgroup>
+                    <thead><tr><th>Vrsta robe odnosno usluga</th><th>Količina</th><th>Cijena</th><th>Vrijednost EUR</th></tr></thead>
+                    <tbody>\(tableRows)</tbody>
+                </table>
+                <div class="totals">
+                    <div class="total-row"><span class="total-label">Ukupno:</span><span class="total-value">\(ukupno.hrFormatted) EUR</span></div>
+                    <div class="total-row main"><span class="total-label">Za plaćanje EUR:</span><span class="total-value">\(ukupno.hrFormatted)</span></div>
+                </div>
+                <div class="notes">\(invoiceNotesHTML)</div>
+            </div>
+            <div class="footer">
+                <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
+                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+            </div>
+        </body>
+        </html>
+        """
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - STUDIO VARAŽDIN Invoice HTML
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    private func generateStudioInvoiceHTML(
+        businessProfile: BusinessProfile,
+        clientHTML: String,
+        tableRows: String,
+        ukupno: Decimal,
+        invoiceMetadataHTML: String,
+        invoiceNotesHTML: String,
+        logoBase64: String?
+    ) -> String {
+        let brandParts = splitBrandName(businessProfile.shortName)
+        let brandTopHTML = brandParts.top.map { "<div class=\"brand-top\">\($0.uppercased())</div>" } ?? ""
+        let brandMainHTML = "<div class=\"brand-main\">\(brandParts.main.uppercased())</div>"
+        
+        return """
+        <!DOCTYPE html>
+        <html lang="hr">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page { size: A4; margin: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; width: 595px; height: 842px; position: relative; background: #FAFAF8; }
+                .header { background: #0D0D0D; text-align: center; padding: 14px 48px; position: relative; }
+                .header::before { content: ''; position: absolute; top: 6px; left: 16px; right: 16px; bottom: 6px; border: 0.5px solid rgba(197,165,90,0.35); }
+                .corner { position: absolute; width: 12px; height: 12px; }
+                .corner::before, .corner::after { content: ''; position: absolute; background: rgba(197,165,90,0.5); }
+                .corner-tl { top: 3px; left: 13px; } .corner-tl::before { width: 12px; height: 1px; top: 0; left: 0; } .corner-tl::after { width: 1px; height: 12px; top: 0; left: 0; }
+                .corner-tr { top: 3px; right: 13px; } .corner-tr::before { width: 12px; height: 1px; top: 0; right: 0; } .corner-tr::after { width: 1px; height: 12px; top: 0; right: 0; }
+                .corner-bl { bottom: 3px; left: 13px; } .corner-bl::before { width: 12px; height: 1px; bottom: 0; left: 0; } .corner-bl::after { width: 1px; height: 12px; bottom: 0; left: 0; }
+                .corner-br { bottom: 3px; right: 13px; } .corner-br::before { width: 12px; height: 1px; bottom: 0; right: 0; } .corner-br::after { width: 1px; height: 12px; bottom: 0; right: 0; }
+                .header-logo { max-width: 380px; max-height: 50px; display: block; margin: 0 auto; object-fit: contain; position: relative; z-index: 1; }
+                .brand-top { font-size: 9px; font-weight: 300; letter-spacing: 6px; color: rgba(197,165,90,0.65); margin-bottom: 2px; }
+                .brand-main { font-size: 24px; font-weight: 700; letter-spacing: 4px; color: #C5A55A; font-family: Georgia, 'Times New Roman', serif; }
+                .title-band { text-align: center; padding: 10px 48px 8px; }
+                .title-line { height: 1.5px; background: #C5A55A; margin: 0; }
+                .title-text { font-family: Georgia, 'Times New Roman', serif; font-size: 32px; font-weight: 400; letter-spacing: 6px; color: #C5A55A; padding: 10px 0; }
+                .content { padding: 20px 48px 0; }
+                .parties { display: flex; gap: 30px; margin-bottom: 14px; }
+                .party { flex: 1; font-size: 9px; line-height: 1.6; color: #777; }
+                .party strong { color: #333; display: block; margin-bottom: 2px; }
+                .metadata { font-size: 9px; line-height: 1.8; color: #777; margin-bottom: 14px; }
+                .metadata .value { color: #333; font-weight: 500; }
+                table { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+                thead th { text-align: left; font-weight: 700; font-size: 9px; color: #333; padding: 8px 6px; border-top: 0.5px solid rgba(197,165,90,0.3); border-bottom: 0.5px solid rgba(197,165,90,0.3); }
+                thead th:first-child { padding-left: 0; } thead th:last-child { padding-right: 0; }
+                thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+                tbody td { padding: 7px 6px; vertical-align: top; border-bottom: 0.3px solid rgba(197,165,90,0.2); color: #333; font-size: 9px; }
+                tbody td:first-child { padding-left: 0; } tbody td:last-child { padding-right: 0; }
+                .text-right { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 9px; white-space: nowrap; }
+                .font-bold { font-weight: 600; }
+                .item-name { word-wrap: break-word; overflow-wrap: break-word; }
+                .item-description-label { font-size: 7.5px; color: #999; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+                .item-description { font-size: 8px; color: #999; margin-top: 2px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; }
+                .totals { margin-top: 0; }
+                .total-row { display: flex; justify-content: flex-end; align-items: center; padding: 8px 0; border-bottom: 0.5px solid rgba(197,165,90,0.3); font-size: 10px; }
+                .total-row.main { font-weight: 800; font-size: 11px; }
+                .total-row.main .total-value { color: #C5A55A; }
+                .total-label { font-weight: 700; color: #333; margin-right: 12px; }
+                .total-value { font-family: 'SF Mono', 'Menlo', monospace; color: #333; min-width: 100px; text-align: right; }
+                .notes { margin-top: 14px; font-size: 8.5px; color: #777; line-height: 1.6; }
+                .notes p { margin-bottom: 4px; }
+                .footer { position: absolute; bottom: 0; left: 0; right: 0; background: #0D0D0D; display: flex; justify-content: space-between; padding: 9px 48px; font-size: 8.5px; color: rgba(197,165,90,0.6); }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
+                \(logoBase64 != nil ? "<img class=\"header-logo\" src=\"\(logoBase64!)\" alt=\"\(escapeHTML(businessProfile.shortName))\">" : "\(brandTopHTML)\(brandMainHTML)")
+            </div>
+            <div class="title-band">
+                <div class="title-line"></div>
+                <div class="title-text">RAČUN</div>
+                <div class="title-line"></div>
+            </div>
+            <div class="content">
+                <div class="parties">
+                    <div class="party">
+                        <strong>\(escapeHTML(businessProfile.name))</strong>
+                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(escapeHTML(businessProfile.fullAddress))<br>
+                        \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
+                        \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
+                        \(!businessProfile.phone.isEmpty ? "Tel.: \(escapeHTML(businessProfile.phone))<br>" : "")
+                        \(!businessProfile.email.isEmpty ? "E-mail: \(escapeHTML(businessProfile.email))" : "")
+                    </div>
+                    <div class="party">\(clientHTML)</div>
+                </div>
+                <div class="metadata">\(invoiceMetadataHTML)</div>
+                <table>
+                    <colgroup><col style="width: 55%"><col style="width: 12%"><col style="width: 15%"><col style="width: 18%"></colgroup>
+                    <thead><tr><th>Vrsta robe odnosno usluga</th><th>Količina</th><th>Cijena</th><th>Vrijednost EUR</th></tr></thead>
+                    <tbody>\(tableRows)</tbody>
+                </table>
+                <div class="totals">
+                    <div class="total-row"><span class="total-label">Ukupno:</span><span class="total-value">\(ukupno.hrFormatted) EUR</span></div>
+                    <div class="total-row main"><span class="total-label">Za plaćanje EUR:</span><span class="total-value">\(ukupno.hrFormatted)</span></div>
+                </div>
+                <div class="notes">\(invoiceNotesHTML)</div>
+            </div>
+            <div class="footer">
+                <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
+                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+            </div>
+        </body>
+        </html>
+        """
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - LOVEMENTS Invoice HTML
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    private func generateLovementsInvoiceHTML(
+        businessProfile: BusinessProfile,
+        clientHTML: String,
+        tableRows: String,
+        ukupno: Decimal,
+        invoiceMetadataHTML: String,
+        invoiceNotesHTML: String,
+        logoBase64: String?
+    ) -> String {
+        return """
+        <!DOCTYPE html>
+        <html lang="hr">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page { size: A4; margin: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #5D4647; width: 595px; height: 842px; position: relative; background: #FFFAFA; }
+                .header { background: #FFF5F5; text-align: center; padding: 18px 48px; }
+                .header-ornament { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 4px 0; }
+                .ornament-line { width: 45px; height: 0.5px; background: rgba(212,160,160,0.5); }
+                .ornament-heart { font-size: 7px; color: rgba(212,160,160,0.6); }
+                .brand-name { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 300; letter-spacing: 4px; color: #B07878; padding: 4px 0; }
+                .title-band { text-align: center; padding: 6px 68px 0; }
+                .title-divider { display: flex; align-items: center; justify-content: center; gap: 12px; }
+                .title-divider-line { flex: 1; height: 0.5px; background: rgba(212,160,160,0.4); }
+                .title-divider-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(212,160,160,0.5); }
+                .title-text { font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 300; letter-spacing: 8px; color: #B07878; padding: 10px 0; }
+                .content { padding: 18px 48px 0; }
+                .parties { display: flex; gap: 30px; margin-bottom: 12px; }
+                .party { flex: 1; font-size: 9px; line-height: 1.6; color: #B08E8E; }
+                .party strong { color: #5D4647; display: block; margin-bottom: 2px; }
+                .metadata { font-size: 9px; line-height: 1.8; color: #B08E8E; margin-bottom: 12px; }
+                .metadata .value { color: #5D4647; font-weight: 500; }
+                table { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+                thead th { text-align: left; font-weight: 700; font-size: 9px; color: #5D4647; padding: 7px 6px; background: #FFF5F5; border-top: 0.5px solid #F0D4D4; border-bottom: 0.5px solid #F0D4D4; }
+                thead th:first-child { padding-left: 0; } thead th:last-child { padding-right: 0; }
+                thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+                tbody td { padding: 7px 6px; vertical-align: top; border-bottom: 0.3px solid #F0D4D4; color: #5D4647; font-size: 9px; }
+                tbody td:first-child { padding-left: 0; } tbody td:last-child { padding-right: 0; }
+                .text-right { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 9px; white-space: nowrap; }
+                .font-bold { font-weight: 600; }
+                .item-name { word-wrap: break-word; overflow-wrap: break-word; }
+                .item-description-label { font-size: 7.5px; color: #C9A8A8; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+                .item-description { font-size: 8px; color: #C9A8A8; margin-top: 2px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; }
+                .totals { margin-top: 0; }
+                .total-row { display: flex; justify-content: flex-end; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #F0D4D4; font-size: 10px; }
+                .total-row.main { font-weight: 800; font-size: 11px; }
+                .total-row.main .total-value { color: #B07878; }
+                .total-label { font-weight: 700; color: #5D4647; margin-right: 12px; }
+                .total-value { font-family: 'SF Mono', 'Menlo', monospace; color: #5D4647; min-width: 100px; text-align: right; }
+                .notes { margin-top: 12px; font-size: 8.5px; color: #B08E8E; line-height: 1.6; font-family: Georgia, 'Times New Roman', serif; }
+                .notes p { margin-bottom: 4px; }
+                .footer { position: absolute; bottom: 0; left: 0; right: 0; background: #FFF5F5; border-top: 0.5px solid rgba(212,160,160,0.3); display: flex; justify-content: space-between; padding: 9px 48px; font-size: 8.5px; color: #B08E8E; font-family: Georgia, 'Times New Roman', serif; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="header-ornament"><div class="ornament-line"></div><div class="ornament-heart">♥</div><div class="ornament-line"></div></div>
+                <div class="brand-name">\(escapeHTML(businessProfile.shortName))</div>
+                <div class="header-ornament"><div class="ornament-line"></div><div class="ornament-heart">♥</div><div class="ornament-line"></div></div>
+            </div>
+            <div class="title-band">
+                <div class="title-divider"><div class="title-divider-line"></div><div class="title-divider-dot"></div><div class="title-divider-line"></div></div>
+                <div class="title-text">RAČUN</div>
+                <div class="title-divider"><div class="title-divider-line"></div><div class="title-divider-dot"></div><div class="title-divider-line"></div></div>
+            </div>
+            <div class="content">
+                <div class="parties">
+                    <div class="party">
+                        <strong>\(escapeHTML(businessProfile.name))</strong>
+                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(escapeHTML(businessProfile.fullAddress))<br>
+                        \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
+                        \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
+                        \(!businessProfile.phone.isEmpty ? "Tel.: \(escapeHTML(businessProfile.phone))<br>" : "")
+                        \(!businessProfile.email.isEmpty ? "E-mail: \(escapeHTML(businessProfile.email))" : "")
+                    </div>
+                    <div class="party">\(clientHTML)</div>
+                </div>
+                <div class="metadata">\(invoiceMetadataHTML)</div>
+                <table>
+                    <colgroup><col style="width: 55%"><col style="width: 12%"><col style="width: 15%"><col style="width: 18%"></colgroup>
+                    <thead><tr><th>Vrsta robe odnosno usluga</th><th>Količina</th><th>Cijena</th><th>Vrijednost EUR</th></tr></thead>
+                    <tbody>\(tableRows)</tbody>
+                </table>
+                <div class="totals">
+                    <div class="total-row"><span class="total-label">Ukupno:</span><span class="total-value">\(ukupno.hrFormatted) EUR</span></div>
+                    <div class="total-row main"><span class="total-label">Za plaćanje EUR:</span><span class="total-value">\(ukupno.hrFormatted)</span></div>
+                </div>
+                <div class="notes">\(invoiceNotesHTML)</div>
+            </div>
+            <div class="footer">
+                <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
+                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+            </div>
+        </body>
+        </html>
+        """
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - DOMY MEDIA Invoice HTML
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    private func generateDomyInvoiceHTML(
+        businessProfile: BusinessProfile,
+        clientHTML: String,
+        tableRows: String,
+        ukupno: Decimal,
+        invoiceMetadataHTML: String,
+        invoiceNotesHTML: String,
+        logoBase64: String?
+    ) -> String {
+        return """
+        <!DOCTYPE html>
+        <html lang="hr">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page { size: A4; margin: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E1E2E; width: 595px; height: 842px; position: relative; background: #FFFFFF; }
+                .header { background: #1A1A2E; text-align: center; padding: 16px 48px; position: relative; }
+                .header::after { content: ''; position: absolute; bottom: 0; left: 48px; right: 48px; height: 3px; background: linear-gradient(90deg, #7B2FF7, #9F5FFF, #7B2FF7); }
+                .header-logo { max-width: 380px; max-height: 50px; display: block; margin: 0 auto; object-fit: contain; }
+                .brand-top { font-size: 8px; font-weight: 400; letter-spacing: 8px; color: rgba(123,47,247,0.5); text-transform: uppercase; margin-bottom: 4px; }
+                .brand-main { font-size: 26px; font-weight: 800; letter-spacing: 5px; color: #FFFFFF; text-transform: uppercase; }
+                .title-band { text-align: center; padding: 10px 48px 0; }
+                .title-text { font-size: 26px; font-weight: 700; letter-spacing: 10px; color: #1E1E2E; padding: 12px 0; text-transform: uppercase; }
+                .title-line { height: 2px; background: #7B2FF7; margin: 0; }
+                .content { padding: 20px 48px 0; }
+                .parties { display: flex; gap: 30px; margin-bottom: 14px; }
+                .party { flex: 1; font-size: 9px; line-height: 1.6; color: #6B7280; }
+                .party strong { color: #1E1E2E; display: block; margin-bottom: 2px; }
+                .metadata { font-size: 9px; line-height: 1.8; color: #6B7280; margin-bottom: 14px; }
+                .metadata .value { color: #1E1E2E; font-weight: 500; }
+                table { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+                thead th { text-align: left; font-weight: 700; font-size: 9px; color: #1E1E2E; padding: 8px 6px; background: #F3F0FF; }
+                thead th:first-child { padding-left: 0; } thead th:last-child { padding-right: 0; }
+                thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+                tbody td { padding: 7px 6px; vertical-align: top; border-bottom: 0.3px solid #E5E7EB; color: #1E1E2E; font-size: 9px; }
+                tbody td:first-child { padding-left: 0; } tbody td:last-child { padding-right: 0; }
+                .text-right { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 9px; white-space: nowrap; }
+                .font-bold { font-weight: 600; }
+                .item-name { word-wrap: break-word; overflow-wrap: break-word; }
+                .item-description-label { font-size: 7.5px; color: #9CA3AF; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+                .item-description { font-size: 8px; color: #9CA3AF; margin-top: 2px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; }
+                .totals { margin-top: 0; }
+                .total-row { display: flex; justify-content: flex-end; align-items: center; padding: 8px 0; border-bottom: 0.5px solid #E5E7EB; font-size: 10px; }
+                .total-row.main { font-weight: 800; font-size: 11px; }
+                .total-row.main .total-value { color: #7B2FF7; }
+                .total-label { font-weight: 700; color: #1E1E2E; margin-right: 12px; }
+                .total-value { font-family: 'SF Mono', 'Menlo', monospace; color: #1E1E2E; min-width: 100px; text-align: right; }
+                .notes { margin-top: 14px; font-size: 8.5px; color: #6B7280; line-height: 1.6; }
+                .notes p { margin-bottom: 4px; }
+                .footer { position: absolute; bottom: 0; left: 0; right: 0; background: #1A1A2E; display: flex; justify-content: space-between; padding: 9px 48px; font-size: 8.5px; color: rgba(123,47,247,0.7); }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                \(logoBase64 != nil ? "<img class=\"header-logo\" src=\"\(logoBase64!)\" alt=\"\(escapeHTML(businessProfile.shortName))\">" : "<div class=\"brand-top\">MEDIA</div><div class=\"brand-main\">\(escapeHTML(businessProfile.shortName).uppercased())</div>")
+            </div>
+            <div class="title-band">
+                <div class="title-text">Račun</div>
+                <div class="title-line"></div>
+            </div>
+            <div class="content">
+                <div class="parties">
+                    <div class="party">
+                        <strong>\(escapeHTML(businessProfile.name))</strong>
+                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(escapeHTML(businessProfile.fullAddress))<br>
+                        \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
+                        \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
+                        \(!businessProfile.phone.isEmpty ? "Tel.: \(escapeHTML(businessProfile.phone))<br>" : "")
+                        \(!businessProfile.email.isEmpty ? "E-mail: \(escapeHTML(businessProfile.email))" : "")
+                    </div>
+                    <div class="party">\(clientHTML)</div>
+                </div>
+                <div class="metadata">\(invoiceMetadataHTML)</div>
+                <table>
+                    <colgroup><col style="width: 55%"><col style="width: 12%"><col style="width: 15%"><col style="width: 18%"></colgroup>
+                    <thead><tr><th>Vrsta robe odnosno usluga</th><th>Količina</th><th>Cijena</th><th>Vrijednost EUR</th></tr></thead>
+                    <tbody>\(tableRows)</tbody>
+                </table>
+                <div class="totals">
+                    <div class="total-row"><span class="total-label">Ukupno:</span><span class="total-value">\(ukupno.hrFormatted) EUR</span></div>
+                    <div class="total-row main"><span class="total-label">Za plaćanje EUR:</span><span class="total-value">\(ukupno.hrFormatted)</span></div>
+                </div>
+                <div class="notes">\(invoiceNotesHTML)</div>
+            </div>
+            <div class="footer">
+                <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
+                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+            </div>
+        </body>
+        </html>
+        """
     }
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1088,6 +1689,285 @@ final class PDFGenerator: NSObject {
     }
     
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MARK: - DOMY MEDIA — Cinematic Broadcast
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    
+    private func generateDomyHTML(
+        businessProfile: BusinessProfile,
+        client: Client?,
+        ponudaBroj: Int,
+        datum: Date,
+        mjesto: String,
+        stavke: [StavkaEditItem],
+        ukupno: Decimal,
+        napomena: String,
+        rokValjanosti: Int,
+        logoBase64: String?
+    ) -> String {
+        let tableRows = buildTableRows(stavke: stavke)
+        let clientHTML = buildClientHTML(client: client)
+        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti)
+        
+        return """
+        <!DOCTYPE html>
+        <html lang="hr">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page { size: A4; margin: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                
+                body {
+                    font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    font-size: 10px;
+                    color: #1E1E2E;
+                    width: 595px;
+                    height: 842px;
+                    position: relative;
+                    background: #FFFFFF;
+                }
+                
+                /* ── HEADER: Deep charcoal with violet gradient bar ── */
+                .header {
+                    background: #1A1A2E;
+                    text-align: center;
+                    padding: 16px 48px;
+                    position: relative;
+                }
+                .header::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 48px;
+                    right: 48px;
+                    height: 3px;
+                    background: linear-gradient(90deg, #7B2FF7, #9F5FFF, #7B2FF7);
+                }
+                
+                .header-logo {
+                    max-width: 380px;
+                    max-height: 50px;
+                    display: block;
+                    margin: 0 auto;
+                    object-fit: contain;
+                }
+                
+                .brand-top {
+                    font-size: 8px;
+                    font-weight: 400;
+                    letter-spacing: 8px;
+                    color: rgba(123,47,247,0.5);
+                    text-transform: uppercase;
+                    margin-bottom: 4px;
+                }
+                
+                .brand-main {
+                    font-size: 26px;
+                    font-weight: 800;
+                    letter-spacing: 5px;
+                    color: #FFFFFF;
+                    text-transform: uppercase;
+                }
+                
+                /* ── TITLE ── */
+                .title-band {
+                    text-align: center;
+                    padding: 10px 48px 0;
+                }
+                
+                .title-text {
+                    font-size: 26px;
+                    font-weight: 700;
+                    letter-spacing: 10px;
+                    color: #1E1E2E;
+                    padding: 12px 0;
+                    text-transform: uppercase;
+                }
+                
+                .title-line {
+                    height: 2px;
+                    background: #7B2FF7;
+                    margin: 0;
+                }
+                
+                /* ── CONTENT ── */
+                .content { padding: 20px 48px 0; }
+                
+                .parties {
+                    display: flex;
+                    gap: 30px;
+                    margin-bottom: 14px;
+                }
+                
+                .party {
+                    flex: 1;
+                    font-size: 9px;
+                    line-height: 1.6;
+                    color: #6B7280;
+                }
+                .party strong { color: #1E1E2E; display: block; margin-bottom: 2px; }
+                
+                .metadata {
+                    font-size: 9px;
+                    line-height: 1.8;
+                    color: #6B7280;
+                    margin-bottom: 12px;
+                }
+                .metadata .value { color: #1E1E2E; font-weight: 500; }
+                
+                /* ── TABLE ── */
+                table { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+                
+                thead th {
+                    text-align: left;
+                    font-weight: 700;
+                    font-size: 9px;
+                    color: #1E1E2E;
+                    padding: 8px 6px;
+                    background: #F3F0FF;
+                }
+                thead th:first-child { padding-left: 0; }
+                thead th:last-child { padding-right: 0; }
+                thead th:nth-child(2),
+                thead th:nth-child(3),
+                thead th:nth-child(4) { text-align: right; }
+                
+                tbody td {
+                    padding: 7px 6px;
+                    vertical-align: top;
+                    border-bottom: 0.3px solid #E5E7EB;
+                    color: #1E1E2E;
+                    font-size: 9px;
+                }
+                tbody td:first-child { padding-left: 0; }
+                tbody td:last-child { padding-right: 0; }
+                
+                .text-right {
+                    text-align: right;
+                    font-family: 'SF Mono', 'Menlo', monospace;
+                    font-size: 9px;
+                    white-space: nowrap;
+                }
+                .font-bold { font-weight: 600; }
+                .item-name { word-wrap: break-word; overflow-wrap: break-word; }
+                .item-description-label { font-size: 7.5px; color: #9CA3AF; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+                .item-description { font-size: 8px; color: #9CA3AF; margin-top: 2px; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word; }
+                
+                /* ── TOTALS ── */
+                .totals { margin-top: 0; }
+                .total-row {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    padding: 8px 0;
+                    border-bottom: 0.5px solid #E5E7EB;
+                    font-size: 10px;
+                }
+                .total-row.main { font-weight: 800; font-size: 11px; }
+                .total-row.main .total-value { color: #7B2FF7; }
+                .total-label { font-weight: 700; color: #1E1E2E; margin-right: 12px; }
+                .total-value {
+                    font-family: 'SF Mono', 'Menlo', monospace;
+                    color: #1E1E2E;
+                    min-width: 100px;
+                    text-align: right;
+                }
+                
+                /* ── NOTES ── */
+                .notes { margin-top: 14px; font-size: 8.5px; color: #6B7280; line-height: 1.6; }
+                .notes p { margin-bottom: 4px; }
+                
+                /* ── FOOTER ── */
+                .footer {
+                    position: absolute;
+                    bottom: 0; left: 0; right: 0;
+                    background: #1A1A2E;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 9px 48px;
+                    font-size: 8.5px;
+                    color: rgba(123,47,247,0.7);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                \(logoBase64 != nil ? "<img class=\"header-logo\" src=\"\(logoBase64!)\" alt=\"\(escapeHTML(businessProfile.shortName))\">" : "<div class=\"brand-top\">MEDIA</div><div class=\"brand-main\">\(escapeHTML(businessProfile.shortName).uppercased())</div>")
+            </div>
+            
+            <div class="title-band">
+                <div class="title-text">Ponuda</div>
+                <div class="title-line"></div>
+            </div>
+            
+            <div class="content">
+                <div class="parties">
+                    <div class="party">
+                        <strong>\(escapeHTML(businessProfile.name))</strong>
+                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(escapeHTML(businessProfile.fullAddress))<br>
+                        \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
+                        \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
+                        \(!businessProfile.phone.isEmpty ? "Tel.: \(escapeHTML(businessProfile.phone))<br>" : "")
+                        \(!businessProfile.email.isEmpty ? "E-mail: \(escapeHTML(businessProfile.email))" : "")
+                    </div>
+                    <div class="party">
+                        \(clientHTML)
+                    </div>
+                </div>
+                
+                <div class="metadata">
+                    <span class="label">Broj:</span> <span class="value">\(ponudaBroj)</span><br>
+                    \(!mjesto.isEmpty ? "<span class=\"label\">Mjesto:</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
+                    <span class="label">Datum:</span> <span class="value">\(datum.hrFormatted)</span>
+                </div>
+                
+                <table>
+                    <colgroup>
+                        <col style="width: 55%">
+                        <col style="width: 12%">
+                        <col style="width: 15%">
+                        <col style="width: 18%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Vrsta robe odnosno usluga</th>
+                            <th>Količina</th>
+                            <th>Cijena</th>
+                            <th>Vrijednost EUR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        \(tableRows)
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <div class="total-row">
+                        <span class="total-label">Ukupno:</span>
+                        <span class="total-value">\(ukupno.hrFormatted) EUR</span>
+                    </div>
+                    <div class="total-row main">
+                        <span class="total-label">Za plaćanje EUR:</span>
+                        <span class="total-value">\(ukupno.hrFormatted)</span>
+                    </div>
+                </div>
+                
+                <div class="notes">
+                    \(notesHTML)
+                </div>
+            </div>
+            
+            <div class="footer">
+                <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
+                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+            </div>
+        </body>
+        </html>
+        """
+    }
+    
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MARK: - Shared HTML Builders
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
@@ -1167,6 +2047,12 @@ final class PDFGenerator: NSObject {
             imageName = "varazdinstudio"
         case .lovements:
             // Lovements uses logoData from the profile if available
+            if let data = businessProfile.logoData {
+                return "data:image/png;base64,\(data.base64EncodedString())"
+            }
+            return nil
+        case .domyMedia:
+            // Domy Media uses logoData from the profile if available
             if let data = businessProfile.logoData {
                 return "data:image/png;base64,\(data.base64EncodedString())"
             }

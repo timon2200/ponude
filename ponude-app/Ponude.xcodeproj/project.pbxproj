@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CC11DD22EE33FF44AA550001 /* AddCompanyWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */; };
-		BB01AA22DD33EE44FF660001 /* DebouncedPreviewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */; };
+		17ACE777D8F9921630658B3E /* InvoiceBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29B736C57906B48DAE32330 /* InvoiceBuilderViewModel.swift */; };
 		191C4CB03E1A07021F57FF48 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4186B473F71E17FE1D766FD /* DashboardView.swift */; };
+		1F662850D688B3518AAC0B3D /* InvoiceDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D868B5AE8D4786D7978869 /* InvoiceDashboardView.swift */; };
 		3A20D994ED5886B934734B0F /* QuoteBuilderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */; };
 		40A6F815712900B506D8FF42 /* ClientListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44CB7A5AA2416DA029F7C59F /* ClientListView.swift */; };
-		AA11BB22CC33DD44EE550001 /* FrequentClientsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */; };
-		AA11BB22CC33DD44EE550003 /* frequent_clients.json in Resources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE550004 /* frequent_clients.json */; };
+		61FE0EAEFE3D55B0CE3459C8 /* FrequentClientsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFFBE6CDF277F4AFC496C29 /* FrequentClientsService.swift */; };
 		7248235991783CAC6CFF7D8A /* SudregService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */; };
 		758F3999FABDA6FF37EC6CEE /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A70A9721A650B894E8697B4 /* SettingsView.swift */; };
+		76B54523E42099C74D3D6D08 /* QuoteTemplateStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4495351821ED61CCCBDC9C /* QuoteTemplateStyle.swift */; };
+		83BFAB631DB3D7AC346B581D /* DebouncedPreviewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1296291638F5CA0AE7DC312 /* DebouncedPreviewWrapper.swift */; };
 		8E3B597D85FD1DCFC55A00FD /* BusinessProfileEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */; };
 		8F91ABD8258CD28CB89CA7F8 /* ClientSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB19A3C44790303A8FA05ED /* ClientSelectorView.swift */; };
 		923FA68A30D33A9FAC06EF43 /* QuoteBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */; };
@@ -23,23 +24,28 @@
 		A032986D644DA777EA15FCAF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49858D69164BA72FFA68EEC /* Extensions.swift */; };
 		A099BCDFE2A8366E4748E070 /* PonudaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6B04E4ADE9B14DEB43C4BCB /* PonudaApp.swift */; };
 		AF4ABEFBD943B1E59896E24D /* Ponuda.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2284FF2E6629EE5E192362BB /* Ponuda.swift */; };
+		B28E2932BDB490C3FEC63CA9 /* Racun.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90013A611D8241DA39AA3C19 /* Racun.swift */; };
+		BEA8885A7C04724D75EEEC5D /* InvoiceBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64D9386B74CC3F8F2F8C818 /* InvoiceBuilderView.swift */; };
+		C640962CAD2029D02B746CAF /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CCC08FED76B09C7C3EFD6FC /* UpdaterViewModel.swift */; };
 		C6CF56FECEF206E12E3788F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F6EE8C198A3307E10ED0CE1 /* Assets.xcassets */; };
+		CCFC2372B09511559CB8E127 /* InvoicePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2E5222D264A42A51066413 /* InvoicePreviewView.swift */; };
+		D4866BEA7680FE20B91563F8 /* AddCompanyWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932B42A9AEA683017703FFBB /* AddCompanyWizardView.swift */; };
 		D4F9F8E18A596C948DE96286 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D95F792287F75B5AC9C4D5A /* ContentView.swift */; };
 		D57B5FE92F0B521328DD79BB /* BusinessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90835610663B7A75507F1709 /* BusinessProfile.swift */; };
+		D9E2CA2DF90F7B96C568136D /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9AE69D7AB8F2E6ED956DC04D /* Sparkle */; };
 		E76C1F3CA5BAC5A64C4123C7 /* QuotePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */; };
 		F082C12B209F7BE6453413F8 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AE558A6FD0B0FEEA066BDB /* Client.swift */; };
-		F1A2B3C4D5E6F7081234ABCD /* QuoteTemplateStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */; };
 		F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */; };
-		DD22EE33FF44AA55BB660001 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		037601514E9D2C050BA1067D /* Ponude.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ponude.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CCC08FED76B09C7C3EFD6FC /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
 		2284FF2E6629EE5E192362BB /* Ponuda.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ponuda.swift; sourceTree = "<group>"; };
-		CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCompanyWizardView.swift; sourceTree = "<group>"; };
 		2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteBuilderView.swift; sourceTree = "<group>"; };
-		BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebouncedPreviewWrapper.swift; sourceTree = "<group>"; };
+		2AFFBE6CDF277F4AFC496C29 /* FrequentClientsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentClientsService.swift; sourceTree = "<group>"; };
 		36AE558A6FD0B0FEEA066BDB /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		38D868B5AE8D4786D7978869 /* InvoiceDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceDashboardView.swift; sourceTree = "<group>"; };
 		3A70A9721A650B894E8697B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		44CB7A5AA2416DA029F7C59F /* ClientListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListView.swift; sourceTree = "<group>"; };
 		4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
@@ -49,24 +55,40 @@
 		7D95F792287F75B5AC9C4D5A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteBuilderViewModel.swift; sourceTree = "<group>"; };
 		8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessProfileEditor.swift; sourceTree = "<group>"; };
+		90013A611D8241DA39AA3C19 /* Racun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Racun.swift; sourceTree = "<group>"; };
 		90835610663B7A75507F1709 /* BusinessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessProfile.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteTemplateStyle.swift; sourceTree = "<group>"; };
+		932B42A9AEA683017703FFBB /* AddCompanyWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCompanyWizardView.swift; sourceTree = "<group>"; };
+		A29B736C57906B48DAE32330 /* InvoiceBuilderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceBuilderViewModel.swift; sourceTree = "<group>"; };
 		A6B04E4ADE9B14DEB43C4BCB /* PonudaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PonudaApp.swift; sourceTree = "<group>"; };
 		AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceItemRow.swift; sourceTree = "<group>"; };
 		B49858D69164BA72FFA68EEC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C1296291638F5CA0AE7DC312 /* DebouncedPreviewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebouncedPreviewWrapper.swift; sourceTree = "<group>"; };
 		C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotePreviewView.swift; sourceTree = "<group>"; };
+		D64D9386B74CC3F8F2F8C818 /* InvoiceBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceBuilderView.swift; sourceTree = "<group>"; };
 		E4186B473F71E17FE1D766FD /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentClientsService.swift; sourceTree = "<group>"; };
-		AA11BB22CC33DD44EE550004 /* frequent_clients.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = frequent_clients.json; sourceTree = "<group>"; };
+		EE2E5222D264A42A51066413 /* InvoicePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoicePreviewView.swift; sourceTree = "<group>"; };
 		F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudregService.swift; sourceTree = "<group>"; };
-		DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
+		FF4495351821ED61CCCBDC9C /* QuoteTemplateStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteTemplateStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		07841EA86453569DB51956E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9E2CA2DF90F7B96C568136D /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0099D3792B7459593978777D /* Builder */ = {
 			isa = PBXGroup;
 			children = (
-				BB01AA22DD33EE44FF660002 /* DebouncedPreviewWrapper.swift */,
+				C1296291638F5CA0AE7DC312 /* DebouncedPreviewWrapper.swift */,
+				D64D9386B74CC3F8F2F8C818 /* InvoiceBuilderView.swift */,
+				EE2E5222D264A42A51066413 /* InvoicePreviewView.swift */,
 				2753A1CB6715ABA31A49FDCE /* QuoteBuilderView.swift */,
 				C5DAA7559F5BCD65ED66FB8B /* QuotePreviewView.swift */,
 				AB21BBCB79E3C9C3B074F4C5 /* ServiceItemRow.swift */,
@@ -85,7 +107,7 @@
 		5FF32D6E045D238F351C5B63 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				CC11DD22EE33FF44AA550002 /* AddCompanyWizardView.swift */,
+				932B42A9AEA683017703FFBB /* AddCompanyWizardView.swift */,
 				8BC8183F77C24C17FB5BD7B6 /* BusinessProfileEditor.swift */,
 				3A70A9721A650B894E8697B4 /* SettingsView.swift */,
 			);
@@ -103,10 +125,10 @@
 		ADD8969BF20AC22AC5D25FA2 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				AA11BB22CC33DD44EE550002 /* FrequentClientsService.swift */,
+				2AFFBE6CDF277F4AFC496C29 /* FrequentClientsService.swift */,
 				4D70BF30C26C4EE96A2E8265 /* PDFGenerator.swift */,
 				F17D0B8802A6EDBF7DF1F677 /* SudregService.swift */,
-				DD22EE33FF44AA55BB660002 /* UpdaterViewModel.swift */,
+				0CCC08FED76B09C7C3EFD6FC /* UpdaterViewModel.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -131,6 +153,7 @@
 		C03D2C421E841AC309994559 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				A29B736C57906B48DAE32330 /* InvoiceBuilderViewModel.swift */,
 				7DE94B18C0AF633F6B005E2B /* QuoteBuilderViewModel.swift */,
 			);
 			path = ViewModels;
@@ -140,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				E4186B473F71E17FE1D766FD /* DashboardView.swift */,
+				38D868B5AE8D4786D7978869 /* InvoiceDashboardView.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -150,17 +174,10 @@
 				90835610663B7A75507F1709 /* BusinessProfile.swift */,
 				36AE558A6FD0B0FEEA066BDB /* Client.swift */,
 				2284FF2E6629EE5E192362BB /* Ponuda.swift */,
-				A1B2C3D4E5F60718ABCD1234 /* QuoteTemplateStyle.swift */,
+				FF4495351821ED61CCCBDC9C /* QuoteTemplateStyle.swift */,
+				90013A611D8241DA39AA3C19 /* Racun.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		AA11BB22CC33DD44EE550005 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				AA11BB22CC33DD44EE550004 /* frequent_clients.json */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 		F1DAA905B91416E10A1A57C5 /* Ponude */ = {
@@ -168,7 +185,6 @@
 			children = (
 				5CE63026702B9F68DEBBF701 /* Helpers */,
 				DF09C53A035D93415DC58CBC /* Models */,
-				AA11BB22CC33DD44EE550005 /* Resources */,
 				ADD8969BF20AC22AC5D25FA2 /* Services */,
 				C03D2C421E841AC309994559 /* ViewModels */,
 				FAC530A58D822B5AF0E919DC /* Views */,
@@ -200,6 +216,7 @@
 			buildPhases = (
 				BE394A62662F05A9BA6D803B /* Sources */,
 				F54803FD08846E100E0071FF /* Resources */,
+				07841EA86453569DB51956E8 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -207,6 +224,7 @@
 			);
 			name = Ponude;
 			packageProductDependencies = (
+				9AE69D7AB8F2E6ED956DC04D /* Sparkle */,
 			);
 			productName = Ponude;
 			productReference = 037601514E9D2C050BA1067D /* Ponude.app */;
@@ -219,7 +237,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					13C4A6F4D6C3914CBCAD19DC = {
 						ProvisioningStyle = Automatic;
@@ -235,6 +253,9 @@
 			);
 			mainGroup = BC726332BD6ADCF819F50084;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F2CBD51BE6997791AA05B2A7 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6BF444BBD6E85AAE3704FD3F /* Products */;
 			projectDirPath = "";
@@ -251,7 +272,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C6CF56FECEF206E12E3788F2 /* Assets.xcassets in Resources */,
-				AA11BB22CC33DD44EE550003 /* frequent_clients.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,28 +282,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CC11DD22EE33FF44AA550001 /* AddCompanyWizardView.swift in Sources */,
+				D4866BEA7680FE20B91563F8 /* AddCompanyWizardView.swift in Sources */,
 				D57B5FE92F0B521328DD79BB /* BusinessProfile.swift in Sources */,
 				8E3B597D85FD1DCFC55A00FD /* BusinessProfileEditor.swift in Sources */,
 				F082C12B209F7BE6453413F8 /* Client.swift in Sources */,
 				40A6F815712900B506D8FF42 /* ClientListView.swift in Sources */,
 				8F91ABD8258CD28CB89CA7F8 /* ClientSelectorView.swift in Sources */,
 				D4F9F8E18A596C948DE96286 /* ContentView.swift in Sources */,
-				BB01AA22DD33EE44FF660001 /* DebouncedPreviewWrapper.swift in Sources */,
 				191C4CB03E1A07021F57FF48 /* DashboardView.swift in Sources */,
+				83BFAB631DB3D7AC346B581D /* DebouncedPreviewWrapper.swift in Sources */,
 				A032986D644DA777EA15FCAF /* Extensions.swift in Sources */,
-				AA11BB22CC33DD44EE550001 /* FrequentClientsService.swift in Sources */,
+				61FE0EAEFE3D55B0CE3459C8 /* FrequentClientsService.swift in Sources */,
+				BEA8885A7C04724D75EEEC5D /* InvoiceBuilderView.swift in Sources */,
+				17ACE777D8F9921630658B3E /* InvoiceBuilderViewModel.swift in Sources */,
+				1F662850D688B3518AAC0B3D /* InvoiceDashboardView.swift in Sources */,
+				CCFC2372B09511559CB8E127 /* InvoicePreviewView.swift in Sources */,
 				9B93148A713635A9CF8B6067 /* PDFGenerator.swift in Sources */,
 				AF4ABEFBD943B1E59896E24D /* Ponuda.swift in Sources */,
 				A099BCDFE2A8366E4748E070 /* PonudaApp.swift in Sources */,
 				923FA68A30D33A9FAC06EF43 /* QuoteBuilderView.swift in Sources */,
 				3A20D994ED5886B934734B0F /* QuoteBuilderViewModel.swift in Sources */,
 				E76C1F3CA5BAC5A64C4123C7 /* QuotePreviewView.swift in Sources */,
-				F1A2B3C4D5E6F7081234ABCD /* QuoteTemplateStyle.swift in Sources */,
+				76B54523E42099C74D3D6D08 /* QuoteTemplateStyle.swift in Sources */,
+				B28E2932BDB490C3FEC63CA9 /* Racun.swift in Sources */,
 				F485A88F7B5FF74FFB4B346D /* ServiceItemRow.swift in Sources */,
 				758F3999FABDA6FF37EC6CEE /* SettingsView.swift in Sources */,
 				7248235991783CAC6CFF7D8A /* SudregService.swift in Sources */,
-				DD22EE33FF44AA55BB660001 /* UpdaterViewModel.swift in Sources */,
+				C640962CAD2029D02B746CAF /* UpdaterViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,9 +322,6 @@
 				CODE_SIGN_ENTITLEMENTS = Ponude/Ponude.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Ponude;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
@@ -350,11 +372,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -370,7 +390,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.10;
@@ -412,11 +431,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -439,7 +456,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.10;
@@ -453,9 +469,6 @@
 				CODE_SIGN_ENTITLEMENTS = Ponude/Ponude.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Ponude;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
@@ -493,6 +506,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F2CBD51BE6997791AA05B2A7 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9AE69D7AB8F2E6ED956DC04D /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F2CBD51BE6997791AA05B2A7 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EB7556D6C36A0B8FE0933A01 /* Project object */;
 }
