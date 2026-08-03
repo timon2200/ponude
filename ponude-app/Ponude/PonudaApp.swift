@@ -8,6 +8,15 @@ struct PonudaApp: App {
     @StateObject private var updaterViewModel = UpdaterViewModel()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+    init() {
+        // Restore the agent API if the user left it switched on. Done here
+        // rather than in the app delegate because `applicationDidFinishLaunching`
+        // is not reliably delivered to a SwiftUI-adapted delegate.
+        if MCPSettings.isEnabled {
+            MCPSettings.apply(enabled: true, port: MCPSettings.port)
+        }
+    }
+
     // MARK: - Shared Model Container
 
     /// A single shared container pinned to an explicit, stable SQLite path.
@@ -189,6 +198,7 @@ struct PonudaApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
+        LocalAPIServer.shared.stop()
         saveOnQuit()
     }
 

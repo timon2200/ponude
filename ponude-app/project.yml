@@ -52,3 +52,15 @@ targets:
       properties:
         com.apple.security.app-sandbox: false
         com.apple.security.network.client: true
+        com.apple.security.network.server: true
+
+  ponude-mcp:
+    type: tool
+    platform: macOS
+    sources:
+      - path: PonudeMCP
+    settings:
+      base:
+        PRODUCT_NAME: ponude-mcp
+        PRODUCT_BUNDLE_IDENTIFIER: hr.lotusrc.ponude.mcp
+        CODE_SIGN_STYLE: Automatic

@@ -356,6 +356,22 @@ Credentials stored in `UserDefaults`:
 - `sudregClientId`
 - `sudregClientSecret`
 
+### `LocalAPIServer.swift` + `APIRouter.swift` + `APIToken.swift`
+
+An opt-in, loopback-only HTTP API that lets AI agents create quotes through the
+`ponude-mcp` bridge. See **[MCP.md](MCP.md)** for setup and the tool list.
+
+1. **`LocalAPIServer`** — `NWListener` pinned to `127.0.0.1`, with just enough
+   HTTP/1.1 parsing to serve JSON. Off by default; toggled in Settings → Agenti.
+2. **`APIRouter`** — `@MainActor`, so every read and write happens on the app's
+   own `mainContext`. Agent-created quotes therefore appear in the UI at once,
+   and all writes go through `Persistence.save`.
+3. **`APIToken`** — 256-bit CSPRNG bearer token in `api-token.txt` (mode 0600),
+   compared in constant time.
+
+The app is deliberately the only process that ever opens the store: a separate
+MCP process writing to `ponude.sqlite` would be a second writer racing the app.
+
 ---
 
 ## Helpers & Design System

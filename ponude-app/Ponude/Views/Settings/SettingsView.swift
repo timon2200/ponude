@@ -19,13 +19,19 @@ struct SettingsView: View {
                 }
                 .tag("sudreg")
             
+            MCPSettingsTab()
+                .tabItem {
+                    Label("Agenti", systemImage: "sparkles")
+                }
+                .tag("mcp")
+
             DefaultsTab()
                 .tabItem {
                     Label("Zadano", systemImage: "gearshape.fill")
                 }
                 .tag("defaults")
         }
-        .frame(width: 550, height: 450)
+        .frame(width: 580, height: 480)
     }
 }
 

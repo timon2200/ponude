@@ -53,6 +53,15 @@ mkdir -p "$FRAMEWORKS_DIR"
 # Copy executable
 cp "$BUILD_DIR/${APP_NAME}" "$MACOS_DIR/${APP_NAME}"
 
+# MCP bridge — shipped alongside the app so an MCP config can point at a
+# stable path inside the bundle.
+if [ -f "$BUILD_DIR/ponude-mcp" ]; then
+    cp "$BUILD_DIR/ponude-mcp" "$MACOS_DIR/ponude-mcp"
+    echo "  ✓ ponude-mcp bridge embedded"
+else
+    echo "  ⚠ ponude-mcp not found at $BUILD_DIR/ponude-mcp"
+fi
+
 # Add @executable_path/../Frameworks rpath so the binary can find embedded frameworks
 install_name_tool -add_rpath @executable_path/../Frameworks "$MACOS_DIR/${APP_NAME}" 2>/dev/null || true
 echo "  ✓ rpath set to @executable_path/../Frameworks"

@@ -6,5 +6,8 @@
 	<false/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- Loopback listener for the local agent (MCP) API -->
+	<key>com.apple.security.network.server</key>
+	<true/>
 </dict>
 </plist>

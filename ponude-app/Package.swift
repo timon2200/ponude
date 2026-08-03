@@ -17,6 +17,12 @@ let package = Package(
             resources: [
                 .process("Resources")
             ]
+        ),
+        // MCP stdio bridge. Ships inside the app bundle and talks to the
+        // running app over its loopback API — it never opens the store itself.
+        .executableTarget(
+            name: "ponude-mcp",
+            path: "PonudeMCP"
         )
     ]
 )

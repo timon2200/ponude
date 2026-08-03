@@ -9,8 +9,17 @@ import WebKit
 ///   • Lotus RC — Cinematic dark navy, bold sans-serif
 ///   • Studio Varaždin — Black/gold ornamental, premium serif
 ///   • Lovements — Soft blush, rose-gold, wedding elegance
+/// Why a headless export can end without producing a file.
+enum PDFExportError: LocalizedError {
+    case cancelled
+
+    var errorDescription: String? {
+        "PDF rendering did not complete — the quote could not be laid out."
+    }
+}
+
 final class PDFGenerator: NSObject {
-    
+
     /// Static set to keep PDFGenerator instances alive during async rendering.
     /// Without this, the generator (created as a local var) gets deallocated
     /// before WKWebView finishes its async HTML load + PDF export.
@@ -21,7 +30,13 @@ final class PDFGenerator: NSObject {
     private var offscreenWindow: NSWindow?
     private var outputURL: URL?
     private var navigationDelegate: PDFNavigationDelegate?
-    
+
+    /// Set for headless exports (the local API); nil for the interactive path.
+    private var completion: ((Result<URL, Error>) -> Void)?
+    /// The interactive export opens the finished file; an API-driven one must not
+    /// steal focus from whatever the user is doing.
+    private var revealOnFinish = true
+
     /// Export a quote as a PDF, presenting a save dialog to the user.
     func exportQuote(
         businessProfile: BusinessProfile,
@@ -72,8 +87,48 @@ final class PDFGenerator: NSObject {
         }
     }
     
+    /// Renders a quote straight to `url` with no save dialog and no reveal.
+    /// Used by the local API so an agent can ask for a finished PDF.
+    @MainActor
+    func exportQuoteToFile(
+        businessProfile: BusinessProfile,
+        client: Client?,
+        ponudaBroj: Int,
+        datum: Date,
+        mjesto: String,
+        stavke: [StavkaEditItem],
+        ukupno: Decimal,
+        napomena: String,
+        rokValjanosti: Int,
+        to url: URL
+    ) async throws -> URL {
+        let html = generateHTML(
+            businessProfile: businessProfile,
+            client: client,
+            ponudaBroj: ponudaBroj,
+            datum: datum,
+            mjesto: mjesto,
+            stavke: stavke,
+            ukupno: ukupno,
+            napomena: napomena,
+            rokValjanosti: rokValjanosti
+        )
+
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+
+        return try await withCheckedThrowingContinuation { continuation in
+            self.revealOnFinish = false
+            self.completion = { continuation.resume(with: $0) }
+            PDFGenerator.activeGenerators.insert(self)
+            self.renderHTMLtoPDF(html: html, outputURL: url)
+        }
+    }
+
     // MARK: - HTML to PDF Rendering
-    
+
     private func renderHTMLtoPDF(html: String, outputURL: URL) {
         self.outputURL = outputURL
         
@@ -133,21 +188,36 @@ final class PDFGenerator: NSObject {
                 case .success(let data):
                     do {
                         try data.write(to: url)
-                        NSWorkspace.shared.open(url)
+                        if self?.revealOnFinish ?? true {
+                            NSWorkspace.shared.open(url)
+                        }
                         print("[PDF] ✅ Successfully exported to \(url.path)")
+                        self?.finish(.success(url))
                     } catch {
                         print("[PDF] ❌ Failed to write: \(error.localizedDescription)")
+                        self?.finish(.failure(error))
                     }
                 case .failure(let error):
                     print("[PDF] ❌ Render error: \(error.localizedDescription)")
+                    self?.finish(.failure(error))
                 }
                 self?.cleanup()
             }
         }
     }
     
+    /// Delivers the outcome exactly once. Calling it before `cleanup` means a
+    /// failure path (navigation error, cancelled panel) can never leave an
+    /// `await` on `exportQuoteToFile` hanging forever.
+    private func finish(_ result: Result<URL, Error>) {
+        let completion = self.completion
+        self.completion = nil
+        completion?(result)
+    }
+
     private func cleanup() {
         print("[PDF] Cleaning up...")
+        finish(.failure(PDFExportError.cancelled))
         offscreenWindow?.close()
         offscreenWindow = nil
         webView = nil
