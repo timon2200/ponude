@@ -254,7 +254,7 @@ struct ClientSelectorView: View {
         .sheet(isPresented: $showAddClientForm) {
             ManualClientForm(clientData: $newClient) { client in
                 modelContext.insert(client)
-                try? modelContext.save()
+                Persistence.save(modelContext, "ClientSelectorView")
                 selectedClient = client
                 dismiss()
             }
@@ -353,7 +353,7 @@ struct ClientSelectorView: View {
             existing.address = subject.adresa.isEmpty ? existing.address : subject.adresa
             existing.city = subject.mjesto.isEmpty ? existing.city : subject.mjesto
             existing.zipCode = subject.postanskiBroj.isEmpty ? existing.zipCode : subject.postanskiBroj
-            try? modelContext.save()
+            Persistence.save(modelContext, "ClientSelectorView")
             selectedClient = existing
             dismiss()
             return
@@ -368,7 +368,7 @@ struct ClientSelectorView: View {
             zipCode: subject.postanskiBroj
         )
         modelContext.insert(client)
-        try? modelContext.save()
+        Persistence.save(modelContext, "ClientSelectorView")
         selectedClient = client
         dismiss()
     }
@@ -389,7 +389,7 @@ struct ClientSelectorView: View {
             zipCode: frequent.zipCode
         )
         modelContext.insert(client)
-        try? modelContext.save()
+        Persistence.save(modelContext, "ClientSelectorView")
         selectedClient = client
         dismiss()
     }

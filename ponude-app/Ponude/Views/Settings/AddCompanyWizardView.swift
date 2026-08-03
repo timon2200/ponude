@@ -807,7 +807,7 @@ struct AddCompanyWizardView: View {
         )
         
         modelContext.insert(profile)
-        try? modelContext.save()
+        Persistence.save(modelContext, "AddCompanyWizardView")
         
         onProfileCreated?(profile)
     }

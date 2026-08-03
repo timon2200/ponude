@@ -345,7 +345,7 @@ struct ContentView: View {
     private func deleteProfile(_ profile: BusinessProfile) {
         let wasSelected = selectedProfile?.id == profile.id
         modelContext.delete(profile)
-        try? modelContext.save()
+        Persistence.save(modelContext, "ContentView")
         
         if wasSelected {
             selectedProfile = profiles.first(where: { $0.id != profile.id }) ?? profiles.first
@@ -484,7 +484,7 @@ struct ContentView: View {
         }
         
         if didChange {
-            try? modelContext.save()
+            Persistence.save(modelContext, "ContentView")
         }
         
         selectedProfile = profiles.first(where: { $0.isDefault }) ?? profiles.first

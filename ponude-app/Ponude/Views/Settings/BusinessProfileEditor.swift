@@ -188,7 +188,7 @@ struct BusinessProfileEditor: View {
             modelContext.insert(profile)
         }
         
-        try? modelContext.save()
+        Persistence.save(modelContext, "BusinessProfileEditor")
         dismiss()
     }
 }

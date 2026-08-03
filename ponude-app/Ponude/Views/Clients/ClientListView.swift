@@ -151,7 +151,7 @@ struct ClientListView: View {
             Button("Obriši", role: .destructive) {
                 if let target = deleteTarget {
                     modelContext.delete(target)
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "ClientListView")
                 }
             }
             Button("Odustani", role: .cancel) { }
@@ -172,11 +172,11 @@ struct ClientListView: View {
                     existing.contactPerson = editData.contactPerson
                     existing.email = editData.email
                     existing.phone = editData.phone
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "ClientListView")
                 } else {
                     // Save new
                     modelContext.insert(newClient)
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "ClientListView")
                 }
             }
         }

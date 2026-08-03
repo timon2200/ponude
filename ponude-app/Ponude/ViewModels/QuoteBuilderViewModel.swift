@@ -14,6 +14,8 @@ final class QuoteBuilderState {
     var stavke: [StavkaEditItem]
     var isSaving = false
     var showSaveSuccess = false
+    /// Non-nil when the last save attempt failed — surfaced in the builder UI.
+    var saveError: String?
     var showExportSuccess = false
     
     /// Initialize from an existing Ponuda or fresh defaults

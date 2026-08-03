@@ -15,6 +15,8 @@ final class InvoiceBuilderState {
     var sourcePonudaBroj: Int
     var isSaving = false
     var showSaveSuccess = false
+    /// Non-nil when the last save attempt failed — surfaced in the builder UI.
+    var saveError: String?
     var showExportSuccess = false
     
     /// Initialize from an existing Racun or fresh defaults

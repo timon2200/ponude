@@ -15,7 +15,12 @@ struct QuoteBuilderView: View {
     @State private var showClientSelector = false
     @State private var showExportPanel = false
     @State private var quoteNumber: Int
-    
+
+    /// The record this editor is bound to. Starts as `existingPonuda` and is set
+    /// on first save, so pressing "Spremi" and then "Izvezi PDF" updates the same
+    /// quote instead of inserting a second copy of it.
+    @State private var savedPonuda: Ponuda?
+
     init(businessProfile: BusinessProfile, existingPonuda: Ponuda?, onDismiss: @escaping () -> Void) {
         self.businessProfile = businessProfile
         self.existingPonuda = existingPonuda
@@ -24,6 +29,7 @@ struct QuoteBuilderView: View {
         let defaultCity = businessProfile.city
         _state = State(initialValue: QuoteBuilderState(ponuda: existingPonuda, defaultMjesto: defaultCity))
         _quoteNumber = State(initialValue: existingPonuda?.broj ?? 0)
+        _savedPonuda = State(initialValue: existingPonuda)
     }
     
     var body: some View {
@@ -335,7 +341,16 @@ struct QuoteBuilderView: View {
             .disabled(!state.isValid)
         }
         .overlay(alignment: .top) {
-            if state.showSaveSuccess {
+            if let error = state.saveError {
+                Text("⚠︎ Spremanje nije uspjelo: \(error)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(DesignTokens.statusRejected, in: Capsule())
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .offset(y: -36)
+            } else if state.showSaveSuccess {
                 Text("✓ Ponuda spremljena")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white)
@@ -352,14 +367,15 @@ struct QuoteBuilderView: View {
     
     private func saveQuote() {
         let ponuda: Ponuda
-        
-        if let existing = existingPonuda {
+
+        if let existing = savedPonuda {
             ponuda = existing
         } else {
             ponuda = Ponuda(broj: quoteNumber)
             modelContext.insert(ponuda)
+            savedPonuda = ponuda
         }
-        
+
         ponuda.datum = state.datum
         ponuda.mjesto = state.mjesto
         ponuda.rokValjanosti = state.rokValjanostiDays
@@ -386,9 +402,13 @@ struct QuoteBuilderView: View {
             modelContext.insert(stavka)
         }
         
-        try? modelContext.save()
-        
+        if let message = Persistence.saveOrError(modelContext, "Ponuda #\(quoteNumber)") {
+            withAnimation { state.saveError = message }
+            return
+        }
+
         withAnimation {
+            state.saveError = nil
             state.showSaveSuccess = true
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

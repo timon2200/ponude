@@ -114,7 +114,7 @@ struct BusinessProfilesTab: View {
             Button("Obriši", role: .destructive) {
                 if let profile = selectedProfile {
                     modelContext.delete(profile)
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "SettingsView")
                 }
             }
             Button("Odustani", role: .cancel) { }

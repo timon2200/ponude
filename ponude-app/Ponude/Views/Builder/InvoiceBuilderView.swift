@@ -15,7 +15,12 @@ struct InvoiceBuilderView: View {
     @State private var state: InvoiceBuilderState
     @State private var showClientSelector = false
     @State private var invoiceNumber: Int
-    
+
+    /// The record this editor is bound to. Starts as `existingRacun` and is set
+    /// on first save, so pressing "Spremi" and then "Izvezi PDF" updates the same
+    /// invoice instead of inserting a second copy of it.
+    @State private var savedRacun: Racun?
+
     init(businessProfile: BusinessProfile, existingRacun: Racun?, sourcePonuda: Ponuda?, onDismiss: @escaping () -> Void) {
         self.businessProfile = businessProfile
         self.existingRacun = existingRacun
@@ -30,6 +35,7 @@ struct InvoiceBuilderView: View {
             _state = State(initialValue: InvoiceBuilderState(racun: existingRacun, defaultMjesto: defaultCity))
         }
         _invoiceNumber = State(initialValue: existingRacun?.broj ?? 0)
+        _savedRacun = State(initialValue: existingRacun)
     }
     
     var body: some View {
@@ -348,7 +354,16 @@ struct InvoiceBuilderView: View {
             .disabled(!state.isValid)
         }
         .overlay(alignment: .top) {
-            if state.showSaveSuccess {
+            if let error = state.saveError {
+                Text("⚠︎ Spremanje nije uspjelo: \(error)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(DesignTokens.statusRejected, in: Capsule())
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .offset(y: -36)
+            } else if state.showSaveSuccess {
                 Text("✓ Račun spremljen")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white)
@@ -366,11 +381,12 @@ struct InvoiceBuilderView: View {
     private func saveInvoice() {
         let racun: Racun
         
-        if let existing = existingRacun {
+        if let existing = savedRacun {
             racun = existing
         } else {
             racun = Racun(broj: invoiceNumber, sourcePonudaBroj: state.sourcePonudaBroj)
             modelContext.insert(racun)
+            savedRacun = racun
         }
         
         racun.datum = state.datum
@@ -399,9 +415,13 @@ struct InvoiceBuilderView: View {
             modelContext.insert(stavka)
         }
         
-        try? modelContext.save()
-        
+        if let message = Persistence.saveOrError(modelContext, "Račun #\(invoiceNumber)") {
+            withAnimation { state.saveError = message }
+            return
+        }
+
         withAnimation {
+            state.saveError = nil
             state.showSaveSuccess = true
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

@@ -73,7 +73,7 @@ struct InvoiceDashboardView: View {
             Button("Obriši", role: .destructive) {
                 if let target = deleteTarget {
                     modelContext.delete(target)
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "InvoiceDashboardView")
                 }
             }
             Button("Odustani", role: .cancel) { }
@@ -264,7 +264,7 @@ struct InvoiceRow: View {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             racun.status = status
                             racun.updatedAt = Date()
-                            try? modelContext.save()
+                            Persistence.save(modelContext, "InvoiceDashboardView")
                         }
                     } label: {
                         Label(status.rawValue, systemImage: status.icon)

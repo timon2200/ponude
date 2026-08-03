@@ -83,7 +83,7 @@ struct DashboardView: View {
             Button("Obriši", role: .destructive) {
                 if let target = deleteTarget {
                     modelContext.delete(target)
-                    try? modelContext.save()
+                    Persistence.save(modelContext, "DashboardView")
                 }
             }
             Button("Odustani", role: .cancel) { }
@@ -322,7 +322,7 @@ struct QuoteRow: View {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             ponuda.status = status
                             ponuda.updatedAt = Date()
-                            try? modelContext.save()
+                            Persistence.save(modelContext, "DashboardView")
                         }
                     } label: {
                         Label(status.rawValue, systemImage: status.icon)
