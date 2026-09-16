@@ -35,6 +35,10 @@ final class Ponuda {
     var mjesto: String             // Location/city
     var rokValjanosti: Int         // Validity in days
     var napomena: String           // Additional notes
+    /// PDF language: "hr" or "en". Optional so existing stores migrate cleanly
+    /// (a mandatory attribute with a Swift-side default fails lightweight
+    /// migration — Core Data never sees the default).
+    var jezik: String?
     var statusRaw: String          // Persisted as raw string
     var createdAt: Date
     var updatedAt: Date
@@ -51,6 +55,9 @@ final class Ponuda {
         get { PonudaStatus(rawValue: statusRaw) ?? .nacrt }
         set { statusRaw = newValue.rawValue }
     }
+
+    /// PDF template language; nil on quotes written before languages existed.
+    var language: String { jezik ?? "hr" }
     
     var sortedStavke: [PonudaStavka] {
         stavke.sorted { $0.redniBroj < $1.redniBroj }
@@ -73,13 +80,15 @@ final class Ponuda {
         datum: Date = Date(),
         mjesto: String = "",
         rokValjanosti: Int = 30,
-        napomena: String = ""
+        napomena: String = "",
+        jezik: String = "hr"
     ) {
         self.broj = broj
         self.datum = datum
         self.mjesto = mjesto
         self.rokValjanosti = rokValjanosti
         self.napomena = napomena
+        self.jezik = jezik
         self.statusRaw = PonudaStatus.nacrt.rawValue
         self.createdAt = Date()
         self.updatedAt = Date()

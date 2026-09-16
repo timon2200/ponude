@@ -189,7 +189,8 @@ let toolDefinitions: [[String: Any]] = [
                 "mjesto": ["type": "string", "description": "Place of issue. Defaults to the profile's city."],
                 "rok_valjanosti": ["type": "integer", "description": "Validity in days. Defaults to 30."],
                 "napomena": ["type": "string", "description": "Free-text note printed on the quote."],
-                "status": ["type": "string", "description": "Nacrt, Poslano, Prihvaćeno, or Odbijeno. Defaults to Nacrt."]
+                "status": ["type": "string", "description": "Nacrt, Poslano, Prihvaćeno, or Odbijeno. Defaults to Nacrt."],
+                "jezik": ["type": "string", "description": "PDF language: 'hr' (default) or 'en' — translates the template chrome (headings, table columns, totals)."]
             ],
             "required": ["profile", "stavke"]
         ]
@@ -224,6 +225,50 @@ let toolDefinitions: [[String: Any]] = [
                 "id": ["type": "string", "description": "Quote id."],
                 "path": ["type": "string", "description": "Optional absolute destination path ending in .pdf."]
             ],
+            "required": ["id"]
+        ]
+    ],
+    [
+        "name": "update_ponuda",
+        "description": "Update an existing quote. Only the fields passed are changed; everything omitted stays as it is. "
+            + "Passing 'stavke' replaces the whole set of line items. Returns the updated quote in full.",
+        "inputSchema": [
+            "type": "object",
+            "properties": [
+                "id": ["type": "string", "description": "Quote id from list_ponude or get_ponuda."],
+                "client_id": ["type": "string", "description": "Reassign the quote to this client (also: client_oib, client_name)."],
+                "client_oib": ["type": "string"],
+                "client_name": ["type": "string"],
+                "stavke": [
+                    "type": "array",
+                    "description": "Full replacement set of line items, in the order they should appear.",
+                    "items": [
+                        "type": "object",
+                        "properties": [
+                            "naziv": ["type": "string", "description": "Service name."],
+                            "opis": ["type": "string", "description": "Optional detail line shown under the name."],
+                            "kolicina": ["type": "number", "description": "Quantity. Defaults to 1."],
+                            "cijena": ["type": "number", "description": "Unit price in EUR."]
+                        ],
+                        "required": ["naziv", "cijena"]
+                    ]
+                ],
+                "datum": ["type": "string", "description": "Issue date as YYYY-MM-DD."],
+                "mjesto": ["type": "string", "description": "Place of issue."],
+                "rok_valjanosti": ["type": "integer", "description": "Validity in days."],
+                "napomena": ["type": "string", "description": "Free-text note printed on the quote."],
+                "status": ["type": "string", "description": "Nacrt, Poslano, Prihvaćeno, or Odbijeno."],
+                "jezik": ["type": "string", "description": "PDF language: 'hr' or 'en'."]
+            ],
+            "required": ["id"]
+        ]
+    ],
+    [
+        "name": "delete_ponuda",
+        "description": "Delete a quote and its line items permanently. There is no undo.",
+        "inputSchema": [
+            "type": "object",
+            "properties": ["id": ["type": "string", "description": "Quote id from list_ponude or get_ponuda."]],
             "required": ["id"]
         ]
     ]
@@ -266,6 +311,16 @@ func callTool(name: String, arguments: [String: Any]) throws -> Any {
         var body: [String: Any] = [:]
         if let path = arguments["path"] as? String { body["path"] = path }
         return try callAPI("POST", "ponude/\(id.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? id)/pdf", body: body)
+
+    case "update_ponuda":
+        guard let id = arguments["id"] as? String else { throw APIError.server("Missing 'id'") }
+        var body = arguments
+        body.removeValue(forKey: "id")
+        return try callAPI("PUT", "ponude/\(id.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? id)", body: body)
+
+    case "delete_ponuda":
+        guard let id = arguments["id"] as? String else { throw APIError.server("Missing 'id'") }
+        return try callAPI("DELETE", "ponude/\(id.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? id)")
 
     default:
         throw APIError.server("Unknown tool '\(name)'")
@@ -319,9 +374,10 @@ func handle(_ message: [String: Any]) {
             "protocolVersion": version,
             "capabilities": ["tools": [:] as [String: Any]],
             "serverInfo": ["name": "ponude", "version": "1.0.0"],
-            "instructions": "Creates and reads quotes (ponude) in the Ponude macOS app. "
+            "instructions": "Creates, updates, and deletes quotes (ponude) in the Ponude macOS app. "
                 + "The app must be running with its agent API enabled. "
-                + "Typical flow: list_business_profiles → search_clients → create_ponuda → export_ponuda_pdf."
+                + "Typical flow: list_business_profiles → search_clients → create_ponuda → export_ponuda_pdf. "
+                + "update_ponuda changes only the fields you pass; delete_ponuda is permanent."
         ])
 
     case "notifications/initialized", "notifications/cancelled":

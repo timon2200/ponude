@@ -18,6 +18,81 @@ enum PDFExportError: LocalizedError {
     }
 }
 
+
+/// Fixed template strings on the quote PDF, per language. The quote's own
+/// content (line items, notes) is authored in the quote itself; these are
+/// only the template's chrome (headings, table columns, totals).
+struct QuoteLabels {
+    let isEnglish: Bool
+    let title: String
+    let number: String
+    let place: String
+    let date: String
+    let colItem: String
+    let colQty: String
+    let colPrice: String
+    let colAmount: String
+    let total: String
+    let totalDue: String
+    let scope: String
+    let ownerPrefix: String
+    let noClient: String
+    let vatNote: String
+
+    static func forLanguage(_ language: String) -> QuoteLabels {
+        if language == "en" {
+            return QuoteLabels(
+                isEnglish: true,
+                title: "QUOTE",
+                number: "No.:",
+                place: "Place:",
+                date: "Date:",
+                colItem: "Description",
+                colQty: "Qty",
+                colPrice: "Price",
+                colAmount: "Amount EUR",
+                total: "Total:",
+                totalDue: "Total due (EUR):",
+                scope: "Scope:",
+                ownerPrefix: "Owner: ",
+                noClient: "No client selected",
+                vatNote: "VAT not charged: flat-rate business, Article 90(2) of the Croatian VAT Act."
+            )
+        }
+        return QuoteLabels(
+            isEnglish: false,
+            title: "PONUDA",
+            number: "Broj:",
+            place: "Mjesto:",
+            date: "Datum:",
+            colItem: "Vrsta robe odnosno usluga",
+            colQty: "Količina",
+            colPrice: "Cijena",
+            colAmount: "Vrijednost EUR",
+            total: "Ukupno:",
+            totalDue: "Za plaćanje EUR:",
+            scope: "Popis isporuka:",
+            ownerPrefix: "Vl. ",
+            noClient: "Klijent nije odabran",
+            vatNote: ""
+        )
+    }
+
+    func validityText(_ days: Int) -> String {
+        isEnglish ? "Valid for \(days) days" : "Rok valjanosti: \(days) dana"
+    }
+
+    func taxStatus(_ rawValue: String) -> String {
+        guard isEnglish else { return rawValue }
+        switch rawValue {
+        case "Paušalni obrtnik": return "Flat-rate business (VAT exempt)"
+        case "U sustavu PDV-a": return "VAT registered"
+        case "Slobodno zanimanje": return "Freelance (VAT exempt)"
+        default: return rawValue
+        }
+    }
+}
+
 final class PDFGenerator: NSObject {
 
     /// Static set to keep PDFGenerator instances alive during async rendering.
@@ -47,7 +122,8 @@ final class PDFGenerator: NSObject {
         stavke: [StavkaEditItem],
         ukupno: Decimal,
         napomena: String,
-        rokValjanosti: Int
+        rokValjanosti: Int,
+        language: String = "hr"
     ) {
         let html = generateHTML(
             businessProfile: businessProfile,
@@ -58,7 +134,8 @@ final class PDFGenerator: NSObject {
             stavke: stavke,
             ukupno: ukupno,
             napomena: napomena,
-            rokValjanosti: rokValjanosti
+            rokValjanosti: rokValjanosti,
+            language: language
         )
         
         // Create save panel
@@ -100,6 +177,7 @@ final class PDFGenerator: NSObject {
         ukupno: Decimal,
         napomena: String,
         rokValjanosti: Int,
+        language: String = "hr",
         to url: URL
     ) async throws -> URL {
         let html = generateHTML(
@@ -111,7 +189,8 @@ final class PDFGenerator: NSObject {
             stavke: stavke,
             ukupno: ukupno,
             napomena: napomena,
-            rokValjanosti: rokValjanosti
+            rokValjanosti: rokValjanosti,
+            language: language
         )
 
         try FileManager.default.createDirectory(
@@ -177,31 +256,42 @@ final class PDFGenerator: NSObject {
         }
         
         print("[PDF] WebView loaded, creating PDF...")
-        
-        let config = WKPDFConfiguration()
-        // A4 in points: 595.28 × 841.89
-        config.rect = CGRect(x: 0, y: 0, width: 595.28, height: 841.89)
-        
-        webView.createPDF(configuration: config) { [weak self] result in
+
+        // The templates are designed as one A4 page, but long item lists or
+        // notes can overflow. The body uses min-height, so measure the real
+        // content height and grow the capture rect instead of clipping the
+        // bottom of the page at exactly 842pt.
+        webView.evaluateJavaScript("document.body.scrollHeight") { [weak self] value, _ in
             DispatchQueue.main.async {
-                switch result {
-                case .success(let data):
-                    do {
-                        try data.write(to: url)
-                        if self?.revealOnFinish ?? true {
-                            NSWorkspace.shared.open(url)
+                guard let self, let webView = self.webView else { return }
+
+                let config = WKPDFConfiguration()
+                // A4 in points: 595.28 × 841.89; grow beyond A4 only when content needs it.
+                let contentHeight = (value as? NSNumber)?.doubleValue ?? 0
+                config.rect = CGRect(x: 0, y: 0, width: 595.28, height: max(841.89, contentHeight))
+
+                webView.createPDF(configuration: config) { [weak self] result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let data):
+                            do {
+                                try data.write(to: url)
+                                if self?.revealOnFinish ?? true {
+                                    NSWorkspace.shared.open(url)
+                                }
+                                print("[PDF] ✅ Successfully exported to \(url.path)")
+                                self?.finish(.success(url))
+                            } catch {
+                                print("[PDF] ❌ Failed to write: \(error.localizedDescription)")
+                                self?.finish(.failure(error))
+                            }
+                        case .failure(let error):
+                            print("[PDF] ❌ Render error: \(error.localizedDescription)")
+                            self?.finish(.failure(error))
                         }
-                        print("[PDF] ✅ Successfully exported to \(url.path)")
-                        self?.finish(.success(url))
-                    } catch {
-                        print("[PDF] ❌ Failed to write: \(error.localizedDescription)")
-                        self?.finish(.failure(error))
+                        self?.cleanup()
                     }
-                case .failure(let error):
-                    print("[PDF] ❌ Render error: \(error.localizedDescription)")
-                    self?.finish(.failure(error))
                 }
-                self?.cleanup()
             }
         }
     }
@@ -238,7 +328,8 @@ final class PDFGenerator: NSObject {
         stavke: [StavkaEditItem],
         ukupno: Decimal,
         napomena: String,
-        rokValjanosti: Int
+        rokValjanosti: Int,
+        language: String = "hr"
     ) -> String {
         let style = QuoteTemplateStyle.style(for: businessProfile)
         let logoBase64 = loadLogoBase64(for: style, businessProfile: businessProfile)
@@ -249,28 +340,28 @@ final class PDFGenerator: NSObject {
                 businessProfile: businessProfile, client: client,
                 ponudaBroj: ponudaBroj, datum: datum, mjesto: mjesto,
                 stavke: stavke, ukupno: ukupno, napomena: napomena,
-                rokValjanosti: rokValjanosti, logoBase64: logoBase64
+                rokValjanosti: rokValjanosti, language: language, logoBase64: logoBase64
             )
         case .studioVarazdin:
             return generateStudioHTML(
                 businessProfile: businessProfile, client: client,
                 ponudaBroj: ponudaBroj, datum: datum, mjesto: mjesto,
                 stavke: stavke, ukupno: ukupno, napomena: napomena,
-                rokValjanosti: rokValjanosti, logoBase64: logoBase64
+                rokValjanosti: rokValjanosti, language: language, logoBase64: logoBase64
             )
         case .lovements:
             return generateLovementsHTML(
                 businessProfile: businessProfile, client: client,
                 ponudaBroj: ponudaBroj, datum: datum, mjesto: mjesto,
                 stavke: stavke, ukupno: ukupno, napomena: napomena,
-                rokValjanosti: rokValjanosti, logoBase64: logoBase64
+                rokValjanosti: rokValjanosti, language: language, logoBase64: logoBase64
             )
         case .domyMedia:
             return generateDomyHTML(
                 businessProfile: businessProfile, client: client,
                 ponudaBroj: ponudaBroj, datum: datum, mjesto: mjesto,
                 stavke: stavke, ukupno: ukupno, napomena: napomena,
-                rokValjanosti: rokValjanosti, logoBase64: logoBase64
+                rokValjanosti: rokValjanosti, language: language, logoBase64: logoBase64
             )
         }
     }
@@ -470,7 +561,7 @@ final class PDFGenerator: NSObject {
             <style>
                 @page { size: A4; margin: 0; }
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E293B; width: 595px; height: 842px; position: relative; background: #FFFFFF; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E293B; width: 595px; min-height: 842px; position: relative; background: #FFFFFF; }
                 .header { background: #0B1929; text-align: center; padding: 14px 48px; }
                 .header-logo { max-width: 380px; max-height: 50px; display: block; margin: 0 auto; object-fit: contain; }
                 .brand-name { font-size: 28px; font-weight: 900; letter-spacing: 6px; color: #FFFFFF; text-transform: uppercase; }
@@ -577,7 +668,7 @@ final class PDFGenerator: NSObject {
             <style>
                 @page { size: A4; margin: 0; }
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; width: 595px; height: 842px; position: relative; background: #FAFAF8; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #333; width: 595px; min-height: 842px; position: relative; background: #FAFAF8; }
                 .header { background: #0D0D0D; text-align: center; padding: 14px 48px; position: relative; }
                 .header::before { content: ''; position: absolute; top: 6px; left: 16px; right: 16px; bottom: 6px; border: 0.5px solid rgba(197,165,90,0.35); }
                 .corner { position: absolute; width: 12px; height: 12px; }
@@ -685,7 +776,7 @@ final class PDFGenerator: NSObject {
             <style>
                 @page { size: A4; margin: 0; }
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #5D4647; width: 595px; height: 842px; position: relative; background: #FFFAFA; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #5D4647; width: 595px; min-height: 842px; position: relative; background: #FFFAFA; }
                 .header { background: #FFF5F5; text-align: center; padding: 18px 48px; }
                 .header-ornament { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 4px 0; }
                 .ornament-line { width: 45px; height: 0.5px; background: rgba(212,160,160,0.5); }
@@ -790,7 +881,7 @@ final class PDFGenerator: NSObject {
             <style>
                 @page { size: A4; margin: 0; }
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E1E2E; width: 595px; height: 842px; position: relative; background: #FFFFFF; }
+                body { font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #1E1E2E; width: 595px; min-height: 842px; position: relative; background: #FFFFFF; }
                 .header { background: #1A1A2E; text-align: center; padding: 16px 48px; position: relative; }
                 .header::after { content: ''; position: absolute; bottom: 0; left: 48px; right: 48px; height: 3px; background: linear-gradient(90deg, #7B2FF7, #9F5FFF, #7B2FF7); }
                 .header-logo { max-width: 380px; max-height: 50px; display: block; margin: 0 auto; object-fit: contain; }
@@ -883,15 +974,17 @@ final class PDFGenerator: NSObject {
         ukupno: Decimal,
         napomena: String,
         rokValjanosti: Int,
+        language: String,
         logoBase64: String?
     ) -> String {
-        let tableRows = buildTableRows(stavke: stavke)
-        let clientHTML = buildClientHTML(client: client)
-        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti)
+        let tableRows = buildTableRows(stavke: stavke, language: language)
+        let L = QuoteLabels.forLanguage(language)
+        let clientHTML = buildClientHTML(client: client, language: language)
+        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti, language: language)
         
         return """
         <!DOCTYPE html>
-        <html lang="hr">
+        <html lang="\(language)">
         <head>
             <meta charset="UTF-8">
             <style>
@@ -903,7 +996,7 @@ final class PDFGenerator: NSObject {
                     font-size: 10px;
                     color: #1E293B;
                     width: 595px;
-                    height: 842px;
+                    min-height: 842px;
                     position: relative;
                     background: #FFFFFF;
                 }
@@ -1064,7 +1157,7 @@ final class PDFGenerator: NSObject {
             </div>
             
             <div class="title-band">
-                <div class="title-text">PONUDA</div>
+                <div class="title-text">\(L.title)</div>
                 <div class="title-line"></div>
             </div>
             
@@ -1072,7 +1165,7 @@ final class PDFGenerator: NSObject {
                 <div class="parties">
                     <div class="party">
                         <strong>\(escapeHTML(businessProfile.name))</strong>
-                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(L.ownerPrefix)\(escapeHTML(businessProfile.ownerName))<br>
                         \(escapeHTML(businessProfile.fullAddress))<br>
                         \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
                         \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
@@ -1085,9 +1178,9 @@ final class PDFGenerator: NSObject {
                 </div>
                 
                 <div class="metadata">
-                    <span class="label">Broj:</span> <span class="value">\(ponudaBroj)</span><br>
-                    \(!mjesto.isEmpty ? "<span class=\"label\">Mjesto:</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
-                    <span class="label">Datum:</span> <span class="value">\(datum.hrFormatted)</span>
+                    <span class="label">\(L.number)</span> <span class="value">\(ponudaBroj)</span><br>
+                    \(!mjesto.isEmpty ? "<span class=\"label\">\(L.place)</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
+                    <span class="label">\(L.date)</span> <span class="value">\(datum.hrFormatted)</span>
                 </div>
                 
                 <table>
@@ -1099,10 +1192,10 @@ final class PDFGenerator: NSObject {
                     </colgroup>
                     <thead>
                         <tr>
-                            <th>Vrsta robe odnosno usluga</th>
-                            <th>Količina</th>
-                            <th>Cijena</th>
-                            <th>Vrijednost EUR</th>
+                            <th>\(L.colItem)</th>
+                            <th>\(L.colQty)</th>
+                            <th>\(L.colPrice)</th>
+                            <th>\(L.colAmount)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1112,11 +1205,11 @@ final class PDFGenerator: NSObject {
                 
                 <div class="totals">
                     <div class="total-row">
-                        <span class="total-label">Ukupno:</span>
+                        <span class="total-label">\(L.total)</span>
                         <span class="total-value">\(ukupno.hrFormatted) EUR</span>
                     </div>
                     <div class="total-row main">
-                        <span class="total-label">Za plaćanje EUR:</span>
+                        <span class="total-label">\(L.totalDue)</span>
                         <span class="total-value">\(ukupno.hrFormatted)</span>
                     </div>
                 </div>
@@ -1128,7 +1221,7 @@ final class PDFGenerator: NSObject {
             
             <div class="footer">
                 <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
-                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+                <span>\(escapeHTML(L.taxStatus(businessProfile.taxStatus.rawValue)))</span>
             </div>
         </body>
         </html>
@@ -1149,18 +1242,20 @@ final class PDFGenerator: NSObject {
         ukupno: Decimal,
         napomena: String,
         rokValjanosti: Int,
+        language: String,
         logoBase64: String?
     ) -> String {
-        let tableRows = buildTableRows(stavke: stavke)
-        let clientHTML = buildClientHTML(client: client)
-        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti)
+        let tableRows = buildTableRows(stavke: stavke, language: language)
+        let L = QuoteLabels.forLanguage(language)
+        let clientHTML = buildClientHTML(client: client, language: language)
+        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti, language: language)
         let brandParts = splitBrandName(businessProfile.shortName)
         let brandTopHTML = brandParts.top.map { "<div class=\"brand-top\">\($0.uppercased())</div>" } ?? ""
         let brandMainHTML = "<div class=\"brand-main\">\(brandParts.main.uppercased())</div>"
         
         return """
         <!DOCTYPE html>
-        <html lang="hr">
+        <html lang="\(language)">
         <head>
             <meta charset="UTF-8">
             <style>
@@ -1172,7 +1267,7 @@ final class PDFGenerator: NSObject {
                     font-size: 10px;
                     color: #333;
                     width: 595px;
-                    height: 842px;
+                    min-height: 842px;
                     position: relative;
                     background: #FAFAF8;
                 }
@@ -1372,7 +1467,7 @@ final class PDFGenerator: NSObject {
             
             <div class="title-band">
                 <div class="title-line"></div>
-                <div class="title-text">PONUDA</div>
+                <div class="title-text">\(L.title)</div>
                 <div class="title-line"></div>
             </div>
             
@@ -1380,7 +1475,7 @@ final class PDFGenerator: NSObject {
                 <div class="parties">
                     <div class="party">
                         <strong>\(escapeHTML(businessProfile.name))</strong>
-                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(L.ownerPrefix)\(escapeHTML(businessProfile.ownerName))<br>
                         \(escapeHTML(businessProfile.fullAddress))<br>
                         \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
                         \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
@@ -1393,9 +1488,9 @@ final class PDFGenerator: NSObject {
                 </div>
                 
                 <div class="metadata">
-                    <span class="label">Broj:</span> <span class="value">\(ponudaBroj)</span><br>
-                    \(!mjesto.isEmpty ? "<span class=\"label\">Mjesto:</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
-                    <span class="label">Datum:</span> <span class="value">\(datum.hrFormatted)</span>
+                    <span class="label">\(L.number)</span> <span class="value">\(ponudaBroj)</span><br>
+                    \(!mjesto.isEmpty ? "<span class=\"label\">\(L.place)</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
+                    <span class="label">\(L.date)</span> <span class="value">\(datum.hrFormatted)</span>
                 </div>
                 
                 <table>
@@ -1407,10 +1502,10 @@ final class PDFGenerator: NSObject {
                     </colgroup>
                     <thead>
                         <tr>
-                            <th>Vrsta robe odnosno usluga</th>
-                            <th>Količina</th>
-                            <th>Cijena</th>
-                            <th>Vrijednost EUR</th>
+                            <th>\(L.colItem)</th>
+                            <th>\(L.colQty)</th>
+                            <th>\(L.colPrice)</th>
+                            <th>\(L.colAmount)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1420,11 +1515,11 @@ final class PDFGenerator: NSObject {
                 
                 <div class="totals">
                     <div class="total-row">
-                        <span class="total-label">Ukupno:</span>
+                        <span class="total-label">\(L.total)</span>
                         <span class="total-value">\(ukupno.hrFormatted) EUR</span>
                     </div>
                     <div class="total-row main">
-                        <span class="total-label">Za plaćanje EUR:</span>
+                        <span class="total-label">\(L.totalDue)</span>
                         <span class="total-value">\(ukupno.hrFormatted)</span>
                     </div>
                 </div>
@@ -1436,7 +1531,7 @@ final class PDFGenerator: NSObject {
             
             <div class="footer">
                 <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
-                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+                <span>\(escapeHTML(L.taxStatus(businessProfile.taxStatus.rawValue)))</span>
             </div>
         </body>
         </html>
@@ -1457,15 +1552,17 @@ final class PDFGenerator: NSObject {
         ukupno: Decimal,
         napomena: String,
         rokValjanosti: Int,
+        language: String,
         logoBase64: String?
     ) -> String {
-        let tableRows = buildTableRows(stavke: stavke)
-        let clientHTML = buildClientHTML(client: client)
-        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti)
+        let tableRows = buildTableRows(stavke: stavke, language: language)
+        let L = QuoteLabels.forLanguage(language)
+        let clientHTML = buildClientHTML(client: client, language: language)
+        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti, language: language)
         
         return """
         <!DOCTYPE html>
-        <html lang="hr">
+        <html lang="\(language)">
         <head>
             <meta charset="UTF-8">
             <style>
@@ -1477,7 +1574,7 @@ final class PDFGenerator: NSObject {
                     font-size: 10px;
                     color: #5D4647;
                     width: 595px;
-                    height: 842px;
+                    min-height: 842px;
                     position: relative;
                     background: #FFFAFA;
                 }
@@ -1683,7 +1780,7 @@ final class PDFGenerator: NSObject {
                     <div class="title-divider-dot"></div>
                     <div class="title-divider-line"></div>
                 </div>
-                <div class="title-text">PONUDA</div>
+                <div class="title-text">\(L.title)</div>
                 <div class="title-divider">
                     <div class="title-divider-line"></div>
                     <div class="title-divider-dot"></div>
@@ -1695,7 +1792,7 @@ final class PDFGenerator: NSObject {
                 <div class="parties">
                     <div class="party">
                         <strong>\(escapeHTML(businessProfile.name))</strong>
-                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(L.ownerPrefix)\(escapeHTML(businessProfile.ownerName))<br>
                         \(escapeHTML(businessProfile.fullAddress))<br>
                         \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
                         \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
@@ -1708,9 +1805,9 @@ final class PDFGenerator: NSObject {
                 </div>
                 
                 <div class="metadata">
-                    <span class="label">Broj:</span> <span class="value">\(ponudaBroj)</span><br>
-                    \(!mjesto.isEmpty ? "<span class=\"label\">Mjesto:</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
-                    <span class="label">Datum:</span> <span class="value">\(datum.hrFormatted)</span>
+                    <span class="label">\(L.number)</span> <span class="value">\(ponudaBroj)</span><br>
+                    \(!mjesto.isEmpty ? "<span class=\"label\">\(L.place)</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
+                    <span class="label">\(L.date)</span> <span class="value">\(datum.hrFormatted)</span>
                 </div>
                 
                 <table>
@@ -1722,10 +1819,10 @@ final class PDFGenerator: NSObject {
                     </colgroup>
                     <thead>
                         <tr>
-                            <th>Vrsta robe odnosno usluga</th>
-                            <th>Količina</th>
-                            <th>Cijena</th>
-                            <th>Vrijednost EUR</th>
+                            <th>\(L.colItem)</th>
+                            <th>\(L.colQty)</th>
+                            <th>\(L.colPrice)</th>
+                            <th>\(L.colAmount)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1735,11 +1832,11 @@ final class PDFGenerator: NSObject {
                 
                 <div class="totals">
                     <div class="total-row">
-                        <span class="total-label">Ukupno:</span>
+                        <span class="total-label">\(L.total)</span>
                         <span class="total-value">\(ukupno.hrFormatted) EUR</span>
                     </div>
                     <div class="total-row main">
-                        <span class="total-label">Za plaćanje EUR:</span>
+                        <span class="total-label">\(L.totalDue)</span>
                         <span class="total-value">\(ukupno.hrFormatted)</span>
                     </div>
                 </div>
@@ -1751,7 +1848,7 @@ final class PDFGenerator: NSObject {
             
             <div class="footer">
                 <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
-                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+                <span>\(escapeHTML(L.taxStatus(businessProfile.taxStatus.rawValue)))</span>
             </div>
         </body>
         </html>
@@ -1772,15 +1869,17 @@ final class PDFGenerator: NSObject {
         ukupno: Decimal,
         napomena: String,
         rokValjanosti: Int,
+        language: String,
         logoBase64: String?
     ) -> String {
-        let tableRows = buildTableRows(stavke: stavke)
-        let clientHTML = buildClientHTML(client: client)
-        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti)
+        let tableRows = buildTableRows(stavke: stavke, language: language)
+        let L = QuoteLabels.forLanguage(language)
+        let clientHTML = buildClientHTML(client: client, language: language)
+        let notesHTML = buildNotesHTML(businessProfile: businessProfile, napomena: napomena, rokValjanosti: rokValjanosti, language: language)
         
         return """
         <!DOCTYPE html>
-        <html lang="hr">
+        <html lang="\(language)">
         <head>
             <meta charset="UTF-8">
             <style>
@@ -1792,7 +1891,7 @@ final class PDFGenerator: NSObject {
                     font-size: 10px;
                     color: #1E1E2E;
                     width: 595px;
-                    height: 842px;
+                    min-height: 842px;
                     position: relative;
                     background: #FFFFFF;
                 }
@@ -1966,7 +2065,7 @@ final class PDFGenerator: NSObject {
             </div>
             
             <div class="title-band">
-                <div class="title-text">Ponuda</div>
+                <div class="title-text">\(L.title)</div>
                 <div class="title-line"></div>
             </div>
             
@@ -1974,7 +2073,7 @@ final class PDFGenerator: NSObject {
                 <div class="parties">
                     <div class="party">
                         <strong>\(escapeHTML(businessProfile.name))</strong>
-                        Vl. \(escapeHTML(businessProfile.ownerName))<br>
+                        \(L.ownerPrefix)\(escapeHTML(businessProfile.ownerName))<br>
                         \(escapeHTML(businessProfile.fullAddress))<br>
                         \(!businessProfile.oib.isEmpty ? "OIB: \(escapeHTML(businessProfile.oib))<br>" : "")
                         \(!businessProfile.iban.isEmpty ? "IBAN: \(escapeHTML(businessProfile.iban))<br>" : "")
@@ -1987,9 +2086,9 @@ final class PDFGenerator: NSObject {
                 </div>
                 
                 <div class="metadata">
-                    <span class="label">Broj:</span> <span class="value">\(ponudaBroj)</span><br>
-                    \(!mjesto.isEmpty ? "<span class=\"label\">Mjesto:</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
-                    <span class="label">Datum:</span> <span class="value">\(datum.hrFormatted)</span>
+                    <span class="label">\(L.number)</span> <span class="value">\(ponudaBroj)</span><br>
+                    \(!mjesto.isEmpty ? "<span class=\"label\">\(L.place)</span> <span class=\"value\">\(escapeHTML(mjesto))</span><br>" : "")
+                    <span class="label">\(L.date)</span> <span class="value">\(datum.hrFormatted)</span>
                 </div>
                 
                 <table>
@@ -2001,10 +2100,10 @@ final class PDFGenerator: NSObject {
                     </colgroup>
                     <thead>
                         <tr>
-                            <th>Vrsta robe odnosno usluga</th>
-                            <th>Količina</th>
-                            <th>Cijena</th>
-                            <th>Vrijednost EUR</th>
+                            <th>\(L.colItem)</th>
+                            <th>\(L.colQty)</th>
+                            <th>\(L.colPrice)</th>
+                            <th>\(L.colAmount)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2014,11 +2113,11 @@ final class PDFGenerator: NSObject {
                 
                 <div class="totals">
                     <div class="total-row">
-                        <span class="total-label">Ukupno:</span>
+                        <span class="total-label">\(L.total)</span>
                         <span class="total-value">\(ukupno.hrFormatted) EUR</span>
                     </div>
                     <div class="total-row main">
-                        <span class="total-label">Za plaćanje EUR:</span>
+                        <span class="total-label">\(L.totalDue)</span>
                         <span class="total-value">\(ukupno.hrFormatted)</span>
                     </div>
                 </div>
@@ -2030,7 +2129,7 @@ final class PDFGenerator: NSObject {
             
             <div class="footer">
                 <span>\(!businessProfile.website.isEmpty ? escapeHTML(businessProfile.website) : "")</span>
-                <span>\(escapeHTML(businessProfile.taxStatus.rawValue))</span>
+                <span>\(escapeHTML(L.taxStatus(businessProfile.taxStatus.rawValue)))</span>
             </div>
         </body>
         </html>
@@ -2041,7 +2140,7 @@ final class PDFGenerator: NSObject {
     // MARK: - Shared HTML Builders
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     
-    private func buildTableRows(stavke: [StavkaEditItem]) -> String {
+    private func buildTableRows(stavke: [StavkaEditItem], language: String = "hr") -> String {
         let visibleStavke = stavke.filter { !$0.naziv.isEmpty }
         var tableRows = ""
         for (index, stavka) in visibleStavke.enumerated() {
@@ -2053,7 +2152,7 @@ final class PDFGenerator: NSObject {
                 let formattedDescription = escapeHTML(stavka.opis)
                     .replacingOccurrences(of: "\n", with: "<br>")
                 descriptionHTML = """
-                    <div class="item-description-label">Popis isporuka:</div>
+                    <div class="item-description-label">\(QuoteLabels.forLanguage(language).scope)</div>
                     <div class="item-description">\(formattedDescription)</div>
                 """
             }
@@ -2072,7 +2171,7 @@ final class PDFGenerator: NSObject {
         return tableRows
     }
     
-    private func buildClientHTML(client: Client?) -> String {
+    private func buildClientHTML(client: Client?, language: String = "hr") -> String {
         if let client = client {
             var lines = [
                 "<strong>\(escapeHTML(client.name.uppercased()))</strong>"
@@ -2089,14 +2188,16 @@ final class PDFGenerator: NSObject {
             }
             return lines.joined(separator: "<br>")
         } else {
-            return "<em style=\"color: #999;\">Klijent nije odabran</em>"
+            return "<em style=\"color: #999;\">\(QuoteLabels.forLanguage(language).noClient)</em>"
         }
     }
     
-    private func buildNotesHTML(businessProfile: BusinessProfile, napomena: String, rokValjanosti: Int) -> String {
-        var notesHTML = "<p>\(escapeHTML(businessProfile.vatExemptNote.isEmpty ? "oslobođen PDV-a" : businessProfile.vatExemptNote))</p>"
+    private func buildNotesHTML(businessProfile: BusinessProfile, napomena: String, rokValjanosti: Int, language: String = "hr") -> String {
+        let labels = QuoteLabels.forLanguage(language)
+        let vatText = labels.isEnglish ? labels.vatNote : (businessProfile.vatExemptNote.isEmpty ? "oslobođen PDV-a" : businessProfile.vatExemptNote)
+        var notesHTML = "<p>\(escapeHTML(vatText))</p>"
         if rokValjanosti > 0 {
-            notesHTML += "<p>Rok valjanosti: \(rokValjanosti) dana</p>"
+            notesHTML += "<p>\(escapeHTML(labels.validityText(rokValjanosti)))</p>"
         }
         if !napomena.isEmpty {
             notesHTML += "<p>\(escapeHTML(napomena))</p>"

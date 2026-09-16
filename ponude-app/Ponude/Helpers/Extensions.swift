@@ -85,9 +85,13 @@ extension String {
     /// Converts a Croatian-formatted number string to Decimal
     var toDecimal: Decimal {
         let cleaned = self
+            .replacingOccurrences(of: "\u{00A0}", with: "")
+            .replacingOccurrences(of: "\u{202F}", with: "")
+            .replacingOccurrences(of: "\u{2212}", with: "-")
+            .replacingOccurrences(of: " ", with: "")
             .replacingOccurrences(of: ".", with: "")
             .replacingOccurrences(of: ",", with: ".")
-            .trimmingCharacters(in: .whitespaces)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         return Decimal(string: cleaned) ?? 0
     }
 }

@@ -43,6 +43,13 @@ struct QuoteBuilderView: View {
         .navigationTitle("")
         .toolbar(.hidden)
         .background(Color(nsColor: .controlBackgroundColor))
+        // Esc returns to the quote list, same as the back action.
+        .background {
+            Button("", action: onDismiss)
+                .keyboardShortcut(.escape, modifiers: [])
+                .hidden()
+        }
+        .onExitCommand(perform: onDismiss)
         .onAppear {
             if quoteNumber == 0 {
                 let profilePonude = allPonude.filter { $0.businessProfile?.id == businessProfile.id }
@@ -431,7 +438,8 @@ struct QuoteBuilderView: View {
             stavke: state.stavke,
             ukupno: state.ukupno,
             napomena: state.napomena,
-            rokValjanosti: state.rokValjanostiDays
+            rokValjanosti: state.rokValjanostiDays,
+            language: savedPonuda?.jezik ?? "hr"
         )
     }
 }

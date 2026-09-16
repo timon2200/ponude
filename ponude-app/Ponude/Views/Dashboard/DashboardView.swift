@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AppKit
 
 /// Dashboard showing a list of quotes with stats cards and search/filter.
 struct DashboardView: View {
@@ -167,7 +168,7 @@ struct DashboardView: View {
                     Text("Datum").frame(width: 100, alignment: .leading)
                     Text("Iznos").frame(width: 120, alignment: .trailing)
                     Text("Status").frame(width: 100, alignment: .center)
-                    Spacer().frame(width: 40)
+                    Spacer().frame(width: 56)
                 }
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
@@ -286,6 +287,7 @@ struct QuoteRow: View {
     @Environment(\.modelContext) private var modelContext
     @State private var isHovered = false
     @State private var isStatusHovered = false
+    @State private var isExportingPDF = false
     
     var body: some View {
         HStack {
@@ -354,14 +356,32 @@ struct QuoteRow: View {
             }
             
             // Actions
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+            HStack(spacing: 14) {
+                // Quick PDF download — straight to Downloads, revealed in Finder.
+                Button(action: exportPDFQuick) {
+                    if isExportingPDF {
+                        ProgressView()
+                            .controlSize(.mini)
+                    } else {
+                        Image(systemName: "arrow.down.doc")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .help("Preuzmi PDF u Downloads")
+                .disabled(isExportingPDF)
+                .opacity(isHovered || isExportingPDF ? 1 : 0)
+
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .opacity(isHovered ? 1 : 0)
             }
-            .buttonStyle(.plain)
-            .opacity(isHovered ? 1 : 0)
-            .frame(width: 40)
+            .frame(width: 56)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -378,6 +398,12 @@ struct QuoteRow: View {
                 onEdit()
             } label: {
                 Label("Uredi ponudu", systemImage: "pencil")
+            }
+
+            Button {
+                exportPDFQuick()
+            } label: {
+                Label("Preuzmi PDF", systemImage: "arrow.down.doc")
             }
             
             if ponuda.status == .prihvaceno {
@@ -399,5 +425,48 @@ struct QuoteRow: View {
         }
         
         Divider().padding(.leading, 16)
+    }
+
+    // MARK: - Quick PDF export
+
+    /// Straight-to-Downloads export without a save dialog; reveals the file in
+    /// Finder when done. Reuses the headless path the local API uses.
+    private func exportPDFQuick() {
+        guard let profile = ponuda.businessProfile, !isExportingPDF else { return }
+        isExportingPDF = true
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        let url = FileManager.default
+            .urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("\(ponuda.broj)-Ponuda_\(formatter.string(from: Date())).pdf")
+
+        let stavke = ponuda.sortedStavke.map { stavka in
+            StavkaEditItem(
+                naziv: stavka.naziv,
+                opis: stavka.opis,
+                kolicina: stavka.kolicina.hrFormatted,
+                cijena: stavka.cijena.hrFormatted
+            )
+        }
+
+        Task { @MainActor in
+            defer { isExportingPDF = false }
+            if let finished = try? await PDFGenerator().exportQuoteToFile(
+                businessProfile: profile,
+                client: ponuda.client,
+                ponudaBroj: ponuda.broj,
+                datum: ponuda.datum,
+                mjesto: ponuda.mjesto,
+                stavke: stavke,
+                ukupno: ponuda.ukupno,
+                napomena: ponuda.napomena,
+                rokValjanosti: ponuda.rokValjanosti,
+                language: ponuda.language,
+                to: url
+            ) {
+                NSWorkspace.shared.activateFileViewerSelecting([finished])
+            }
+        }
     }
 }

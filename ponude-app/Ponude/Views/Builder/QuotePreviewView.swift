@@ -21,12 +21,18 @@ struct QuotePreviewView: View {
     private var style: QuoteTemplateStyle { .style(for: businessProfile) }
     private var visibleStavke: [StavkaEditItem] { stavke.filter { !$0.naziv.isEmpty } }
     
+    @State private var canvasScale: CGFloat = 1
+    @State private var canvasOffset: CGPoint = .zero
+    @State private var canvasInitialized = false
+
     var body: some View {
         GeometryReader { geo in
-            let availableWidth = geo.size.width - 24  // account for horizontal padding
-            let scale = min(availableWidth / pageWidth, 1.0)
-            
-            ScrollView(.vertical, showsIndicators: true) {
+            ZStack(alignment: .topLeading) {
+                // Canvas sits behind the page and receives every gesture.
+                PanZoomCanvas(scale: $canvasScale, offset: $canvasOffset) {
+                    resetCanvas(in: geo.size)
+                }
+
                 pageContent
                     .frame(width: pageWidth)
                     .frame(minHeight: pageHeight)
@@ -34,18 +40,27 @@ struct QuotePreviewView: View {
                     .background(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 2))
                     .shadow(color: .black.opacity(0.12), radius: 16, y: 6)
-                    .scaleEffect(scale, anchor: .topLeading)
-                    .frame(
-                        width: pageWidth * scale,
-                        height: pageHeight * scale,
-                        alignment: .topLeading
-                    )
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 12)
+                    .scaleEffect(canvasScale, anchor: .topLeading)
+                    .offset(x: canvasOffset.x, y: canvasOffset.y)
+                    .allowsHitTesting(false)
             }
-            .scrollIndicators(.hidden)
-            .defaultScrollAnchor(.top)
+            .clipped()
+            .onAppear {
+                if !canvasInitialized {
+                    resetCanvas(in: geo.size)
+                    canvasInitialized = true
+                }
+            }
         }
+    }
+
+    /// Whole page visible and centered — the "fit" view, also the
+    /// double-click reset target.
+    private func resetCanvas(in size: CGSize) {
+        let fit = min((size.width - 48) / pageWidth, (size.height - 48) / pageHeight)
+        canvasScale = fit
+        canvasOffset = CGPoint(x: (size.width - pageWidth * fit) / 2,
+                               y: (size.height - pageHeight * fit) / 2)
     }
     
     // MARK: - Page Content (dispatches to style)

@@ -51,6 +51,12 @@ enum Router {
             guard let match = findPonuda(id: id) else { return .error(404, "No quote with id \(id)") }
             return .json(detail(match))
 
+        case ("PUT", "ponude", 2), ("PATCH", "ponude", 2):
+            return updatePonuda(id: segments[1], body: request.json)
+
+        case ("DELETE", "ponude", 2):
+            return deletePonuda(id: segments[1])
+
         case ("POST", "ponude", 3) where segments[2] == "pdf":
             return await exportPDF(id: segments[1], body: request.json)
 
@@ -179,24 +185,12 @@ enum Router {
             return .error(404, "No client matching the given client_id / client_oib / client_name")
         }
 
-        guard let rawStavke = body["stavke"] as? [[String: Any]], !rawStavke.isEmpty else {
-            return .error(400, "Field 'stavke' must be a non-empty array of line items")
-        }
-
-        var items: [(naziv: String, opis: String, kolicina: Decimal, cijena: Decimal)] = []
-        for (index, raw) in rawStavke.enumerated() {
-            guard let naziv = (raw["naziv"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines), !naziv.isEmpty else {
-                return .error(400, "stavke[\(index)] is missing 'naziv'")
-            }
-            guard let cijena = Parse.decimal(raw["cijena"]) else {
-                return .error(400, "stavke[\(index)] has a missing or unparseable 'cijena'")
-            }
-            items.append((
-                naziv: naziv,
-                opis: (raw["opis"] as? String) ?? "",
-                kolicina: Parse.decimal(raw["kolicina"]) ?? 1,
-                cijena: cijena
-            ))
+        let items: [(naziv: String, opis: String, kolicina: Decimal, cijena: Decimal)]
+        switch parseStavke(body) {
+        case .failure(let error):
+            return .error(400, error.message)
+        case .success(let parsed):
+            items = parsed
         }
 
         // Numbering mirrors the builder: next number in this profile's own
@@ -214,7 +208,8 @@ enum Router {
             datum: Parse.date(body["datum"]) ?? Date(),
             mjesto: (body["mjesto"] as? String) ?? profile.city,
             rokValjanosti: body["rok_valjanosti"] as? Int ?? 30,
-            napomena: (body["napomena"] as? String) ?? ""
+            napomena: (body["napomena"] as? String) ?? "",
+            jezik: (body["jezik"] as? String) ?? (body["language"] as? String) ?? "hr"
         )
         if let statusRaw = body["status"] as? String, let status = PonudaStatus(rawValue: statusRaw) {
             ponuda.status = status
@@ -243,6 +238,102 @@ enum Router {
         return .json(["ponuda": detail(ponuda)], status: 201)
     }
 
+    /// Partial update: only fields present in the body are touched. Passing
+    /// `stavke` replaces the whole set of line items, mirroring how the
+    /// builder's save works.
+    private static func updatePonuda(id: String, body: [String: Any]) -> HTTPResponse {
+        guard let ponuda = findPonuda(id: id) else { return .error(404, "No quote with id \(id)") }
+
+        if let datum = Parse.date(body["datum"]) { ponuda.datum = datum }
+        if let mjesto = body["mjesto"] as? String, !mjesto.isEmpty { ponuda.mjesto = mjesto }
+        if let rok = body["rok_valjanosti"] as? Int, rok > 0 { ponuda.rokValjanosti = rok }
+        if let napomena = body["napomena"] as? String { ponuda.napomena = napomena }
+        if let jezik = body["jezik"] as? String ?? body["language"] as? String { ponuda.jezik = jezik }
+        if let statusRaw = body["status"] as? String {
+            guard let status = PonudaStatus(rawValue: statusRaw) else {
+                return .error(400, "Unknown status '\(statusRaw)' (Nacrt, Poslano, Prihvaćeno, Odbijeno)")
+            }
+            ponuda.status = status
+        }
+
+        // Client reassignment is opt-in — only when a client_* key is present.
+        if body.keys.contains(where: { $0 == "client_id" || $0 == "client_oib" || $0 == "client_name" }) {
+            guard let client = resolveClient(body) else {
+                return .error(404, "No client matching the given client_id / client_oib / client_name")
+            }
+            ponuda.client = client
+        }
+
+        if body["stavke"] != nil {
+            let items: [(naziv: String, opis: String, kolicina: Decimal, cijena: Decimal)]
+            switch parseStavke(body) {
+            case .failure(let error):
+                return .error(400, error.message)
+            case .success(let parsed):
+                items = parsed
+            }
+            for stavka in ponuda.stavke { context.delete(stavka) }
+            for (index, item) in items.enumerated() {
+                let stavka = PonudaStavka(
+                    redniBroj: index + 1,
+                    naziv: item.naziv,
+                    opis: item.opis,
+                    kolicina: item.kolicina,
+                    cijena: item.cijena
+                )
+                stavka.ponuda = ponuda
+                context.insert(stavka)
+            }
+        }
+
+        ponuda.updatedAt = Date()
+
+        if let message = Persistence.saveOrError(context, "API update Ponuda #\(ponuda.broj)") {
+            return .error(500, message)
+        }
+        LocalAPIServer.log.info("Updated Ponuda #\(ponuda.broj, privacy: .public) via API")
+        return .json(["ponuda": detail(ponuda)])
+    }
+
+    private static func deletePonuda(id: String) -> HTTPResponse {
+        guard let ponuda = findPonuda(id: id) else { return .error(404, "No quote with id \(id)") }
+        let broj = ponuda.broj
+        // The stavke relationship cascades, so line items go with the quote.
+        context.delete(ponuda)
+
+        if let message = Persistence.saveOrError(context, "API delete Ponuda #\(broj)") {
+            return .error(500, message)
+        }
+        LocalAPIServer.log.info("Deleted Ponuda #\(broj, privacy: .public) via API")
+        return .json(["deleted": true, "broj": broj])
+    }
+
+    /// Validates the `stavke` array shared by create and update.
+    private struct StavkaError: Error { let message: String }
+
+    private static func parseStavke(_ body: [String: Any]) -> Result<[(naziv: String, opis: String, kolicina: Decimal, cijena: Decimal)], StavkaError> {
+        guard let rawStavke = body["stavke"] as? [[String: Any]], !rawStavke.isEmpty else {
+            return .failure(StavkaError(message: "Field 'stavke' must be a non-empty array of line items"))
+        }
+
+        var items: [(naziv: String, opis: String, kolicina: Decimal, cijena: Decimal)] = []
+        for (index, raw) in rawStavke.enumerated() {
+            guard let naziv = (raw["naziv"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines), !naziv.isEmpty else {
+                return .failure(StavkaError(message: "stavke[\(index)] is missing 'naziv'"))
+            }
+            guard let cijena = Parse.decimal(raw["cijena"]) else {
+                return .failure(StavkaError(message: "stavke[\(index)] has a missing or unparseable 'cijena'"))
+            }
+            items.append((
+                naziv: naziv,
+                opis: (raw["opis"] as? String) ?? "",
+                kolicina: Parse.decimal(raw["kolicina"]) ?? 1,
+                cijena: cijena
+            ))
+        }
+        return .success(items)
+    }
+
     private static func summary(_ ponuda: Ponuda) -> [String: Any] {
         [
             "id": IDCodec.encode(ponuda.persistentModelID),
@@ -261,6 +352,7 @@ enum Router {
         payload["mjesto"] = ponuda.mjesto
         payload["rok_valjanosti"] = ponuda.rokValjanosti
         payload["napomena"] = ponuda.napomena
+        payload["jezik"] = ponuda.language
         payload["client_oib"] = ponuda.client?.oib ?? ""
         payload["stavke"] = ponuda.sortedStavke.map { stavka in
             [
@@ -301,7 +393,7 @@ enum Router {
             StavkaEditItem(
                 naziv: stavka.naziv,
                 opis: stavka.opis,
-                kolicina: stavka.kolicina.hrFormatted,
+                kolicina: stavka.kolicina == 1 ? "1" : stavka.kolicina.hrFormatted,
                 cijena: stavka.cijena.hrFormatted
             )
         }
@@ -317,6 +409,7 @@ enum Router {
                 ukupno: ponuda.ukupno,
                 napomena: ponuda.napomena,
                 rokValjanosti: ponuda.rokValjanosti,
+                language: ponuda.language,
                 to: destination
             )
             return .json(["path": url.path, "broj": ponuda.broj])
@@ -327,19 +420,25 @@ enum Router {
 
     // MARK: - Lookup helpers
 
+    /// `context.model(for:)` traps on an id whose object was deleted (e.g. an
+    /// agent retrying a stale id), so resolution goes through a fetch, which
+    /// only ever returns live objects.
     private static func findPonuda(id: String) -> Ponuda? {
         guard let identifier = IDCodec.decode(id) else { return nil }
-        return context.model(for: identifier) as? Ponuda
+        let all = (try? context.fetch(FetchDescriptor<Ponuda>())) ?? []
+        return all.first { $0.persistentModelID == identifier }
     }
 
     /// Resolves a profile from an opaque id or, more usefully for an agent, from
     /// a human name: "Lotus RC", "lotus", or an OIB all work.
     private static func resolveProfile(_ key: String) -> BusinessProfile? {
-        if let identifier = IDCodec.decode(key), let profile = context.model(for: identifier) as? BusinessProfile {
+        let profiles = (try? context.fetch(FetchDescriptor<BusinessProfile>())) ?? []
+
+        if let identifier = IDCodec.decode(key),
+           let profile = profiles.first(where: { $0.persistentModelID == identifier }) {
             return profile
         }
 
-        let profiles = (try? context.fetch(FetchDescriptor<BusinessProfile>())) ?? []
         let needle = key.folded
 
         if let exact = profiles.first(where: { $0.shortName.folded == needle || $0.name.folded == needle || $0.oib == key }) {
@@ -349,13 +448,13 @@ enum Router {
     }
 
     private static func resolveClient(_ body: [String: Any]) -> Client? {
+        let clients = (try? context.fetch(FetchDescriptor<Client>())) ?? []
+
         if let id = body["client_id"] as? String,
            let identifier = IDCodec.decode(id),
-           let client = context.model(for: identifier) as? Client {
+           let client = clients.first(where: { $0.persistentModelID == identifier }) {
             return client
         }
-
-        let clients = (try? context.fetch(FetchDescriptor<Client>())) ?? []
 
         if let oib = body["client_oib"] as? String, !oib.isEmpty {
             return clients.first { $0.oib == oib }

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ponuda 2026-SA-04 — Grad Samobor & TZ Samobor</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 20mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #141715;
+      background: #ffffff;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #141715;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+    .brand {
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+    .doc-meta {
+      text-align: right;
+      font-size: 12px;
+    }
+    .doc-number {
+      font-weight: 800;
+      font-size: 15px;
+      color: #ca8a04;
+    }
+    .client-block {
+      background: #f8faf9;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .client-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .client-name {
+      font-weight: 800;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .project-hero {
+      margin-bottom: 24px;
+    }
+    .project-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .project-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .project-desc {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 4px;
+    }
+    table.items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    table.items-table th {
+      background: #141715;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: 9px 12px;
+    }
+    table.items-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+      font-size: 12px;
+    }
+    table.items-table td.num {
+      font-weight: 800;
+      width: 35px;
+      color: #64748b;
+    }
+    table.items-table td.item-title {
+      font-weight: 800;
+      color: #0f172a;
+    }
+    table.items-table td.item-desc {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+    table.items-table td.price {
+      text-align: right;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+      width: 120px;
+    }
+    .totals-area {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
+    }
+    .totals-box {
+      width: 280px;
+      border: 1.5px solid #141715;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .totals-row.grand {
+      background: #141715;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 14px;
+      border-bottom: none;
+      padding: 10px 12px;
+    }
+    .totals-row.grand span:last-child {
+      color: #facc15;
+    }
+    .terms-box {
+      background: #f8faf9;
+      border-left: 3px solid #ca8a04;
+      padding: 12px 16px;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+    .terms-box strong {
+      color: #0f172a;
+    }
+    .signature-area {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      padding-top: 18px;
+    }
+    .sig-col {
+      width: 45%;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 8px;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .sig-col strong {
+      color: #0f172a;
+      display: block;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <div class="brand">STUDIO VARAŽDIN</div>
+      <div class="brand-sub">KREATIVNA PRODUKCIJA & TEHNOLOGIJA // varazdin.studio</div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-number">PONUDA BR. 2026-SA-04</div>
+      <div>Datum: 16. rujna 2026.</div>
+      <div>Valjanost: 45 dana</div>
+    </div>
+  </div>
+
+  <div class="client-block">
+    <div>
+      <div class="client-title">Naručitelj 1 (Gradska uprava)</div>
+      <div class="client-name">GRAD SAMOBOR</div>
+      <div>Trg kralja Tomislava 5, 10430 Samobor</div>
+      <div>Za: dr. sc. Petra Škrobot, gradonačelnica</div>
+    </div>
+    <div>
+      <div class="client-title">Naručitelj 2 (Turistička zajednica)</div>
+      <div class="client-name">TURISTIČKA ZAJEDNICA GRADA SAMOBORA</div>
+      <div>Trg kralja Tomislava 5, 10430 Samobor</div>
+      <div>Za: Iva Pehar, direktorica</div>
+    </div>
+  </div>
+
+  <div class="project-hero">
+    <span class="project-badge">INTEGRIRANI DIGITALNO-FILMSKI PROJEKT</span>
+    <div class="project-title">VRUDNIK — Spust u rov Bergmana 1540. & Dan grada Samobora 2026</div>
+    <div class="project-desc">Razvoj samostojeće interaktivne VR atrakcije u Unreal Engineu 5 za Rudnik sv. Barbare u Rudama i kinematski 4K izvještajni film za Svečanu sjednicu uz 3x 9:16 vertikale za društvene mreže.</div>
+  </div>
+
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Opis stavke i opseg isporuke</th>
+        <th class="price">Iznos (EUR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">1.</td>
+        <td>
+          <div class="item-title">VRUDNIK — Imerzivni VR Kiosk sustav (Rudnik sv. Barbare, Rude)</div>
+          <div class="item-desc">
+            • 3D fotogrametrijsko lasersko skeniranje rovova Kokel i Sveto Trojstvo u visokoj rezoluciji.<br>
+            • Razvoj interaktivnog 6DOF VR doživljaja u Unreal Engineu 5 (Nanite & Lumen osvjetljenje).<br>
+            • Izrada 3D modela saskog rudara Bergmana, alata (dlijeto, uljanica, čekić) i fizike klesanja stijene.<br>
+            • Samostojeći Kiosk operativni sustav za Meta Quest 3 s automatskim resetom i dvojezičnom naracijom (HR/EN).<br>
+            • Isporuka 2x Meta Quest 3 uređaja s punjačima, zaštitnim postoljem i obukom djelatnika KUD-a Oštrc.
+          </div>
+        </td>
+        <td class="price">16.500,00 €</td>
+      </tr>
+      <tr>
+        <td class="num">2.</td>
+        <td>
+          <div class="item-title">Kinematski Vox-film za Dan grada Samobora (4K Master + 3x 9:16 Vertikale)</div>
+          <div class="item-desc">
+            • Filmsko snimanje na terenu sa ZEISS Supreme Prime objektivima i Red V-Raptor 8K kamerom.<br>
+            • FPV snimanje dronom iznad utvrde Tepec, Samoborskog gorja i revitaliziranog kompleksa Taborec.<br>
+            • 3D arhivski parallax povijesnih dokumenata (Povelja Bele IV. 1242., Livadićeva budnica 1835.).<br>
+            • Snimanje izjava (gradonačelnica, ravnatelji, građani) o projektima bez prireza i novim školama.<br>
+            • Montaža 4K filma za Svečanu sjednicu (8-10 min) + 3 modularne vertikale za Reels i TikTok.
+          </div>
+        </td>
+        <td class="price">7.500,00 €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="totals-area">
+    <div class="totals-box">
+      <div class="totals-row">
+        <span>Ukupno bez PDV-a:</span>
+        <span>24.000,00 €</span>
+      </div>
+      <div class="totals-row">
+        <span>PDV (25%):</span>
+        <span>6.000,00 €</span>
+      </div>
+      <div class="totals-row grand">
+        <span>SVEUKUPNO S PDV-OM:</span>
+        <span>30.000,00 €</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="terms-box">
+    <strong>Uvjeti i napomene ponude:</strong><br>
+    • Mogućnost ugovaranja pojedinačnih stavki (Stavka 1: VRudnik 16.500 € + PDV / Stavka 2: Film 7.500 € + PDV).<br>
+    • Projekt je u cijelosti usklađen s uvjetima sufinanciranja putem HTZ Fonda za udružene turističke zajednice.<br>
+    • Vremenski i prostorno neograničena autorska prava za Grad Samobor i Turističku zajednicu Grada Samobora.<br>
+    • Uključena 2 kruga dorada na filmskom materijalu i 12 mjeseci tehničkog jamstva na VR Kiosk postav.
+  </div>
+
+  <div class="signature-area">
+    <div class="sig-col">
+      <strong>Za Naručitelja:</strong>
+      Grad Samobor / Turistička zajednica<br>
+      M.P. / Potpis ovlaštene osobe
+    </div>
+    <div class="sig-col" style="text-align: right;">
+      <strong>Za Izvršitelja:</strong>
+      STUDIO VARAŽDIN (Vl. Jasenka Martinčević)<br>
+      S. Vraza 10, Varaždin • OIB: 63287352089
+    </div>
+  </div>
+
+</body>
+</html>

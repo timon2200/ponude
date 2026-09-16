@@ -81,6 +81,8 @@ which the app writes when you enable the server.
 | `create_ponuda`          | Creates the quote. Numbering is automatic per profile.               |
 | `list_ponude`            | Existing quotes, newest number first.                                |
 | `get_ponuda`             | One quote in full, with line items.                                  |
+| `update_ponuda`          | Partial update — only the fields passed change; `stavke` replaces all line items. |
+| `delete_ponuda`          | Deletes the quote and its line items. Permanent, no undo.            |
 | `export_ponuda_pdf`      | Renders to PDF using the profile's design; returns the path.         |
 
 A typical agent run:
@@ -108,9 +110,10 @@ rejected rather than guessed.
 - The server runs only while the app is open and the toggle is on. It is off by
   default.
 
-An agent with the token can create quotes and clients, and write PDFs to paths
-it chooses. It cannot delete or modify anything — there are no destructive
-routes.
+An agent with the token can create, update, and delete quotes, create clients,
+and write PDFs to paths it chooses. Deletion is permanent — agents should
+confirm with the user before calling `delete_ponuda`, the same as they would
+before any irreversible action.
 
 ---
 
@@ -128,6 +131,8 @@ Useful for scripting without MCP. All routes need
 | GET    | `/ponude`            | `?profile=`, `?limit=`                          |
 | POST   | `/ponude`            | `{profile, client_*, stavke[], datum?, …}`      |
 | GET    | `/ponude/{id}`       | —                                               |
+| PUT    | `/ponude/{id}`       | Partial update — only the fields sent change; `stavke` replaces all line items. `PATCH` accepted too. |
+| DELETE | `/ponude/{id}`       | Deletes the quote and its line items. Permanent. |
 | POST   | `/ponude/{id}/pdf`   | `{path?}` — defaults to `~/Downloads`           |
 
 ```bash
