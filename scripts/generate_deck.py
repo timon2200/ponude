@@ -1050,7 +1050,7 @@ def generate_presentation(ponuda_data, theme="eco-utility", output_path="index.h
         </a>
 
         <!-- Hero Authorize CTA Button -->
-        <a class="btn-auth-hero" href="mailto:info@varazdin.studio?subject=Potvrda%20Ponude%20-%20{client_name}&body=Poštovani,%0D%0A%0D%0APotvrđujemo%20prihvaćanje%20ponude%20u%20iznosu%20od%20{total}.%0D%0A%0D%0ASrdačan%20pozdrav,">
+        <a class="btn-auth-hero" href="mailto:timon.terzic@gmail.com?subject=Potvrda%20Ponude%20-%20{client_name}&body=Poštovani,%0D%0A%0D%0APotvrđujemo%20prihvaćanje%20ponude%20u%20iznosu%20od%20{total}.%0D%0A%0D%0ASrdačan%20pozdrav,">
           <div class="btn-auth-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
