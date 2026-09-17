@@ -255,7 +255,6 @@
 }
 
 .offer-box {
-  background: var(--bg-card);
   border: 2px solid var(--text-primary);
   border-radius: 8px;
   padding: 1.25rem 1.4rem;
@@ -263,18 +262,25 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  box-shadow: 5px 5px 0px var(--text-primary);
   position: relative;
   box-sizing: border-box;
+  transition: opacity 0.4s ease;
 }
 
 .offer-box.cloth-active {
   opacity: 0;
 }
 
+.offer-box.essential {
+  background: var(--bg-card-subtle);
+  box-shadow: 4px 4px 0px var(--text-primary);
+}
+
 .offer-box.signature {
-  border-color: var(--accent-green);
-  background: #fdfbf7;
+  background: #0d1815;
+  color: #ffffff;
+  border: 2px solid #10b981;
+  box-shadow: 6px 6px 0px var(--accent-green);
 }
 
 .tier-badge {
@@ -290,8 +296,17 @@
   margin-bottom: 0.5rem;
 }
 
+.offer-box.essential .tier-badge {
+  background: var(--bg-card);
+  border: 1.5px solid var(--text-primary);
+  color: var(--text-primary);
+}
+
 .offer-box.signature .tier-badge {
-  background: var(--accent-green);
+  background: #10b981;
+  color: #0d1815;
+  border: 1.5px solid #ffffff;
+  font-weight: 900;
 }
 
 .tier-title {
@@ -302,11 +317,22 @@
   margin-bottom: 0.4rem;
 }
 
+.offer-box.signature .tier-title {
+  color: #ffffff;
+}
+
 .tier-desc {
   font-size: 0.78rem;
-  color: var(--text-secondary);
   line-height: 1.35;
   margin-bottom: 0.8rem;
+}
+
+.offer-box.essential .tier-desc {
+  color: var(--text-secondary);
+}
+
+.offer-box.signature .tier-desc {
+  color: #9cb1a8;
 }
 
 .tier-features {
@@ -324,10 +350,25 @@
   line-height: 1.3;
 }
 
+.offer-box.essential .tier-features li {
+  color: var(--text-primary);
+}
+
+.offer-box.signature .tier-features li {
+  color: #ffffff;
+}
+
 .tier-features .bullet {
-  color: var(--accent-green);
   font-weight: 900;
   font-family: var(--font-mono);
+}
+
+.offer-box.essential .tier-features .bullet {
+  color: var(--accent-green);
+}
+
+.offer-box.signature .tier-features .bullet {
+  color: #10b981;
 }
 
 .tier-price-row {
@@ -336,86 +377,135 @@
   margin-top: 0.65rem;
 }
 
+.offer-box.signature .tier-price-row {
+  border-top: 1.5px dashed rgba(16, 185, 129, 0.35);
+}
+
 .tier-price-row .price-label {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 800;
+}
+
+.offer-box.essential .tier-price-row .price-label {
   color: var(--text-muted);
+}
+
+.offer-box.signature .tier-price-row .price-label {
+  color: #10b981;
 }
 
 .tier-price-row .price-val {
   font-family: var(--font-hero);
   font-size: 1.85rem;
   font-weight: 900;
-  color: var(--text-primary);
   line-height: 1.1;
+}
+
+.offer-box.essential .tier-price-row .price-val {
+  color: var(--text-primary);
+}
+
+.offer-box.signature .tier-price-row .price-val {
+  color: #ffffff;
 }
 
 .tier-price-row .vat-text {
   font-family: var(--font-mono);
   font-size: 0.68rem;
+}
+
+.offer-box.essential .tier-price-row .vat-text {
   color: var(--text-muted);
+}
+
+.offer-box.signature .tier-price-row .vat-text {
+  color: #10b981;
 }
 
 /* Slide 6 PDF and Contact Grid */
 .pdf-download-card {
-  background: var(--bg-card-subtle);
+  background: var(--bg-card);
   border: 2px solid var(--text-primary);
   border-radius: 6px;
-  padding: 1rem 1.15rem;
-  box-shadow: 4px 4px 0px var(--text-primary);
-  margin-top: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.55rem;
+  box-shadow: 3px 3px 0px var(--text-primary);
 }
 
 .pdf-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.45rem;
 }
 
 .pdf-card-tag {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: var(--accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .pdf-spec-badge {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: var(--text-muted);
+  background: var(--bg-card-subtle);
+  padding: 1px 5px;
+  border-radius: 3px;
 }
 
 .pdf-download-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
 }
 
 .btn-pdf-download {
-  background: #ffffff;
-  border: 1.5px solid var(--text-primary);
-  border-radius: 4px;
-  padding: 8px 10px;
-  text-decoration: none;
-  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   gap: 2px;
-  transition: all 0.2s;
+  padding: 7px 9px;
+  border: 2px solid var(--text-primary);
+  border-radius: 5px;
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
   box-shadow: 2px 2px 0px var(--text-primary);
+  transition: all 0.15s ease;
 }
 
 .btn-pdf-download:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3.5px 3.5px 0px var(--text-primary);
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 4px 4px 0px var(--text-primary) !important;
   background: var(--accent-green-bg);
+}
+
+.btn-pdf-download:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 1px 1px 0px var(--text-primary) !important;
+}
+
+.btn-pdf-download.signature-dl {
+  border: 2px solid var(--accent-green-bright);
+  border-radius: 5px;
+  background: #0a0e12;
+  color: #ffffff;
+  box-shadow: 2px 2px 0px var(--accent-green);
+}
+
+.btn-pdf-download.signature-dl:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 5px 5px 0px var(--accent-green) !important;
+  background: #000000;
 }
 
 .btn-dl-top {
@@ -426,24 +516,35 @@
 
 .dl-quote-num {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 800;
   color: var(--accent-green);
 }
 
-.dl-quote-num.star {
-  color: #0d5c3a;
+.btn-pdf-download.signature-dl .dl-quote-num {
+  color: #7de095;
 }
 
 .dl-quote-title {
   font-family: var(--font-hero);
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.btn-pdf-download.signature-dl .dl-quote-title {
+  color: #ffffff;
 }
 
 .dl-quote-sub {
-  font-size: 0.65rem;
+  font-size: 0.66rem;
   color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.btn-pdf-download.signature-dl .dl-quote-sub {
+  color: #9cb3a2;
 }
 
 .pdf-auth-row {

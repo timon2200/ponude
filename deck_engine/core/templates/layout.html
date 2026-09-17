@@ -23,7 +23,7 @@
 </head>
 <body>
   <!-- Ambient Particle Canvas -->
-  <canvas id="canvasUiParticles" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:1;"></canvas>
+  <canvas id="canvasUiParticles" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:2;"></canvas>
 
   <!-- Top App Navigation Bar -->
   <header class="deck-header">
@@ -33,11 +33,6 @@
     </div>
 
     <div class="deck-controls-top">
-      <button class="btn-action" id="btnAutoplay" onclick="toggleAutoplay()" title="Automatska prezentacija">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span id="autoplayLabel">Auto Play</span>
-      </button>
-
       <button class="btn-action btn-sound-toggle" id="btnSound" onclick="toggleSound()" title="Zvučni efekti (M)">
         <span id="soundIconOff" style="display:inline-block;">🔇</span>
         <span id="soundIconOn" style="display:none;">🔊</span>
@@ -108,9 +103,11 @@
     </div>
   </div>
 
-  <!-- JavaScript Modules & Runtime -->
-  <script type="module">
+  <!-- JavaScript Runtime & Physics Engines -->
+  <script>
 {{CORE_JS}}
+
+{{PROJECT_JS}}
 
     // Global navigation bindings
     const navigator = new DeckNavigator({
@@ -123,38 +120,13 @@
     window.nextSlide = () => navigator.nextSlide();
     window.prevSlide = () => navigator.prevSlide();
 
-    // Autoplay Controller
-    let autoplayInterval = null;
-    window.toggleAutoplay = function() {
-      const btn = document.getElementById('btnAutoplay');
-      const label = document.getElementById('autoplayLabel');
-      if (autoplayInterval) {
-        clearInterval(autoplayInterval);
-        autoplayInterval = null;
-        if (label) label.textContent = 'Auto Play';
-        if (btn) btn.classList.remove('active');
-      } else {
-        if (label) label.textContent = 'Pause Auto';
-        if (btn) btn.classList.add('active');
-        autoplayInterval = setInterval(() => {
-          if (navigator.currentSlide < navigator.totalSlides) {
-            navigator.nextSlide();
-          } else {
-            navigator.goToSlide(1);
-          }
-        }, 5500);
-      }
-    };
-
     // Initialize CanvasUI Effects
-    initCanvasUiParticles();
-    initRetroDither();
-    initVideoModal();
-  </script>
-
-  <!-- Project Specific JavaScript -->
-  <script>
-{{PROJECT_JS}}
+    if (typeof initCanvasUiParticles === 'function') initCanvasUiParticles();
+    if (typeof initRetroDither === 'function') initRetroDither();
+    if (typeof initVideoModal === 'function') initVideoModal();
+    if (typeof initClothCardPhysics === 'function') {
+      initClothCardPhysics(window.customClothRenderers || null);
+    }
   </script>
 </body>
 </html>
