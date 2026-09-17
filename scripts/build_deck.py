@@ -43,8 +43,7 @@ def bundle_core_css():
         "header.css",
         "footer.css",
         "components.css",
-        "modal.css",
-        "mobile.css"
+        "modal.css"
     ]
     parts = []
     for fname in order:
@@ -52,6 +51,12 @@ def bundle_core_css():
         if fpath.exists():
             parts.append(f"/* --- Core: {fname} --- */\n" + load_file(fpath))
     return "\n\n".join(parts)
+
+def load_mobile_css():
+    mobile_file = ENGINE_DIR / "core" / "css" / "mobile.css"
+    if mobile_file.exists():
+        return f"/* --- Responsive: mobile.css --- */\n" + load_file(mobile_file)
+    return ""
 
 def bundle_core_js():
     js_dir = ENGINE_DIR / "core" / "js"
@@ -105,6 +110,7 @@ def compile_deck(deck_dir, deploy=False, theme_override=None):
 
     # 2. Core CSS & JS
     core_css = bundle_core_css()
+    mobile_css = load_mobile_css()
     core_js = bundle_core_js()
 
     # 3. Project custom CSS & JS
@@ -193,6 +199,7 @@ def compile_deck(deck_dir, deploy=False, theme_override=None):
         "THEME_CSS": theme_css,
         "CORE_CSS": core_css,
         "CUSTOM_CSS": custom_css,
+        "MOBILE_CSS": mobile_css,
         "SLIDES": "\n".join(slides_html_parts),
         "SLIDE_DOTS": "\n".join(slide_dots_parts),
         "TOTAL_SLIDES": total_slides,
