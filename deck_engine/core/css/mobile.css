@@ -525,4 +525,63 @@
   .btn-fullscreen {
     display: none !important;
   }
+
+  /* Mobile Video Modal */
+  .video-modal {
+    padding: 10px 8px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .video-modal-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95) !important;
+  }
+
+  .video-modal-header {
+    padding: 10px 12px !important;
+    min-height: 48px !important;
+    gap: 8px !important;
+  }
+
+  .video-modal-tag {
+    font-size: 0.52rem !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .video-modal-header h4 {
+    font-size: 0.82rem !important;
+    max-width: 155px !important;
+  }
+
+  .btn-yt-direct {
+    padding: 5px 10px !important;
+    font-size: 0.65rem !important;
+    gap: 5px !important;
+  }
+
+  .btn-yt-direct .yt-text-desktop {
+    display: none !important;
+  }
+
+  .btn-yt-direct .yt-text-mobile {
+    display: inline !important;
+  }
+
+  .video-modal-close-btn {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .video-modal-footer {
+    padding: 6px 12px !important;
+    font-size: 0.54rem !important;
+  }
+
+  .vmf-hint {
+    display: none !important;
+  }
 }
+

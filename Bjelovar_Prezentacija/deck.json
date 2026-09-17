@@ -1,0 +1,55 @@
+{
+  "title": "WELLNESS IZ DUBINE — Kronika geotermalnog Bjelovara | Grad Bjelovar & Bjelovarsko-bilogorska županija",
+  "client_name": "Grad Bjelovar & Bjelovarsko-bilogorska županija",
+  "slug": "bjelovar",
+  "theme": "eco-utility",
+  "header_tag": "GEOTERMALNA KRONIKA // 2026",
+  "contact_email": "timon.terzic@gmail.com",
+  "total": "14.000,00 € — 18.000,00 €",
+  "pdf_path": "assets/Ponuda_Grad_Bjelovar_Zupanija_2026_BJ_04.pdf",
+  "issuer": {
+    "name": "STUDIO VARAŽDIN",
+    "owner": "Vl. Jasenka Martinčević",
+    "address": "S. Vraza 10, Varaždin",
+    "oib": "63287352089",
+    "partner": "Lotus RC"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "file": "slides/01_hero.html",
+      "title": "Energija iz dubine: 83°C",
+      "category": "Kadar 1: Otvaranje • Geotermalni bazen Korenovo"
+    },
+    {
+      "id": 2,
+      "file": "slides/02_concept.html",
+      "title": "Terme Wellovar & Megaprojekti",
+      "category": "Kadar 2: Megaprojekti • Terme, Bolnica & Stadion"
+    },
+    {
+      "id": 3,
+      "file": "slides/03_formats.html",
+      "title": "4K Master film + 3 Vertikale",
+      "category": "Formati • Dan grada (29.9.) & Dan županije (8.6.)"
+    },
+    {
+      "id": 4,
+      "file": "slides/04_production.html",
+      "title": "4 faze produkcije & 3D slojevi",
+      "category": "Metodologija • Geotermalni 3D slojevi & FPV"
+    },
+    {
+      "id": 5,
+      "file": "slides/05_offer.html",
+      "title": "Komercijalna ponuda (A vs B)",
+      "category": "Komercijalni paketi • Essential vs Signature"
+    },
+    {
+      "id": 6,
+      "file": "slides/06_auth.html",
+      "title": "Terminski plan & Autorizacija",
+      "category": "Partnerstvo & Autorizacija • Dan grada (29.9.)"
+    }
+  ]
+}

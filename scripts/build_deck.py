@@ -236,6 +236,11 @@ def compile_deck(deck_dir, deploy=False, theme_override=None):
 
         print(f"🚀 Deployed to varazdin.studio website: {web_dir}")
 
+        # Auto-update central pitches dashboard
+        dashboard_script = PONUDE_ROOT / "scripts" / "build_dashboard.py"
+        if dashboard_script.exists():
+            os.system(f"python3 '{dashboard_script}' --deploy >/dev/null 2>&1 || true")
+
     return True
 
 def watch_deck(deck_dir, deploy=False):

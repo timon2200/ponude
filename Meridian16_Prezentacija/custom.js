@@ -44,21 +44,25 @@ function renderCardTextureA(canvas, w, h, dpr) {
   ctx.lineWidth = 2;
   roundRect(ctx, 1, 1, w - 2, h - 2, 12, true, true);
 
+  // Top Badge
   ctx.fillStyle = '#111518';
   roundRect(ctx, 22, 20, 185, 24, 4, true, false);
   ctx.fillStyle = '#ffffff';
   ctx.font = '800 10.5px "JetBrains Mono", monospace';
   ctx.fillText('OPTION A • QUOTE NO. 9', 30, 36);
 
+  // Title
   ctx.fillStyle = '#111518';
-  ctx.font = '900 20px "Syne", sans-serif';
+  ctx.font = '900 20px "Plus Jakarta Sans", sans-serif';
   ctx.fillText('EXPANDED', 22, 65);
   ctx.fillText('PRODUCTION', 22, 86);
 
+  // Description
   ctx.fillStyle = '#3b454e';
-  ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
-  wrapText(ctx, 'Cinema equipment, multiple setups, director interview, up to 10 FPV flights, hero film & 4 verticals.', 22, 105, w - 44, 16);
+  ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+  wrapText(ctx, 'Cinema equipment, multiple setups, leadership interview, up to 10 FPV flights, hero film & 4 verticals.', 22, 105, w - 44, 15);
 
+  // Divider Line
   ctx.strokeStyle = '#d5ccba';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -66,9 +70,12 @@ function renderCardTextureA(canvas, w, h, dpr) {
   ctx.lineTo(w - 22, 140);
   ctx.stroke();
 
+  const boxH = 72;
+  const boxY = h - boxH - 18;
+
   const features = [
     ['Hero Film up to 2:30', ' (16:9, 4K Cinema Master)'],
-    ['Interview with Director (17 Sep)', ' (2 Cams, Gimbal, Lighting)'],
+    ['Leadership Interview', ' (2 Cams, Gimbal, Lighting)'],
     ['4x Vertical Video Reels', ' (LinkedIn & Social Media)'],
     ['Up to 10 FPV Flights', ' + Peak-Traffic Timelapses & Dronelapses'],
     ['Pre-production', ' (Concept, Script, Moodboard, Site Scout)'],
@@ -81,22 +88,20 @@ function renderCardTextureA(canvas, w, h, dpr) {
   features.forEach(([bold, norm], idx) => {
     const featY = startY + idx * featSpacing;
     ctx.fillStyle = '#11421f';
-    ctx.font = '800 13px "JetBrains Mono", monospace';
+    ctx.font = '800 12px "JetBrains Mono", monospace';
     ctx.fillText('✓', 24, featY);
 
     ctx.fillStyle = '#111518';
-    ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '700 11.5px "Plus Jakarta Sans", sans-serif';
     const boldW = ctx.measureText(bold).width;
     ctx.fillText(bold, 44, featY);
 
     ctx.fillStyle = '#3b454e';
-    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '500 11px "Plus Jakarta Sans", sans-serif';
     ctx.fillText(norm, 44 + boldW, featY);
   });
 
-  const boxH = 72;
-  const boxY = h - boxH - 18;
-
+  // Price Bottom Row
   ctx.fillStyle = '#f4efe4';
   ctx.strokeStyle = '#d5ccba';
   ctx.lineWidth = 1.5;
@@ -107,7 +112,7 @@ function renderCardTextureA(canvas, w, h, dpr) {
   ctx.fillText('TOTAL INVESTMENT (QUOTE NO. 9)', 28, boxY + 20);
 
   ctx.fillStyle = '#111518';
-  ctx.font = '900 26px "Syne", sans-serif';
+  ctx.font = '900 26px "Plus Jakarta Sans", sans-serif';
   ctx.fillText('€ 13,000', 28, boxY + 46);
 
   ctx.fillStyle = '#79828a';
@@ -143,16 +148,16 @@ function renderCardTextureB(canvas, w, h, dpr) {
 
   // Title
   ctx.fillStyle = '#ffffff';
-  ctx.font = '900 20px "Syne", sans-serif';
+  ctx.font = '900 20px "Plus Jakarta Sans", sans-serif';
   ctx.fillText('FULL VISION', 22, 65);
   ctx.fillText('PACKAGE', 22, 86);
 
   // Description
   ctx.fillStyle = '#9cb1a8';
-  ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
-  wrapText(ctx, 'Full cinematic rollout: dedicated storyboard, indoor FPV route test, teleprompter, sound designer score & teaser.', 22, 105, w - 44, 16);
+  ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+  wrapText(ctx, 'Full cinematic rollout: dedicated storyboard team, long timelapses, photo archive, sound design & music composer, pre-written narration.', 22, 105, w - 44, 15);
 
-  // Divider
+  // Divider Line
   ctx.strokeStyle = '#1d362a';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -165,22 +170,22 @@ function renderCardTextureB(canvas, w, h, dpr) {
 
   const features = [
     ['Hero Film up to 2:30 + 60s Teaser Trailer', ' (16:9, 4K)'],
-    ['Director Interview + Teleprompter', ' (2 Cams, Gimbal, Lighting)'],
+    ['Pre-written Narration & Interviews', ' for Ivana & Richard'],
     ['4x Vertical Video Reels', ' (LinkedIn, Web & Social)'],
-    ['Full FPV Package with Spotter & Route Test', ' + Green Corridors'],
-    ['Deep Pre-production', ' (Storyboard, Concept, Scout & FPV Test)'],
-    ['Custom Sound Designer Score & SFX', ' + Master Color Grade'],
+    ['Long Timelapses & Dronelapses', ' (Stationary & Aerial, Dawn Light)'],
+    ['Client Photo Archive Integration', ' (20-Year Evolution)'],
+    ['Dedicated Storyboard Team & Full FPV Package', ' with Spotter & Tests'],
+    ['Custom Sound Design & Music Composer Score', ' + Color Grade'],
     ['100% Source Footage & Full Rights Transfer', ' to Client']
   ];
 
-  const startY = 158;
-  const availH = boxY - 14 - startY;
-  const featSpacing = availH / (features.length - 1);
+  const startY = 160;
+  const featSpacing = 24.5;
 
   features.forEach(([bold, norm], idx) => {
     const featY = startY + idx * featSpacing;
     ctx.fillStyle = '#10b981';
-    ctx.font = '800 13px "JetBrains Mono", monospace';
+    ctx.font = '800 12px "JetBrains Mono", monospace';
     ctx.fillText('★', 24, featY);
 
     ctx.fillStyle = '#ffffff';
@@ -189,7 +194,7 @@ function renderCardTextureB(canvas, w, h, dpr) {
     ctx.fillText(bold, 44, featY);
 
     ctx.fillStyle = '#9cb1a8';
-    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '500 11px "Plus Jakarta Sans", sans-serif';
     ctx.fillText(norm, 44 + boldW, featY);
   });
 
@@ -204,7 +209,7 @@ function renderCardTextureB(canvas, w, h, dpr) {
   ctx.fillText('TOTAL INVESTMENT (QUOTE NO. 15)', 28, boxY + 20);
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = '900 26px "Syne", sans-serif';
+  ctx.font = '900 26px "Plus Jakarta Sans", sans-serif';
   ctx.fillText('€ 17,000', 28, boxY + 46);
 
   ctx.fillStyle = '#10b981';

@@ -69,15 +69,12 @@ main.deck-stage {
   position: absolute;
   top: 0;
   left: 0;
-  padding: clamp(1.6rem, 2.5vw, 2.4rem) clamp(2rem, 3.2vw, 3.5rem);
+  padding: clamp(1.3rem, 2.2vw, 2.1rem) clamp(1.8rem, 2.8vw, 3.2rem);
   flex-direction: column;
   justify-content: space-between;
   opacity: 0;
   transition: opacity 0.25s ease;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
+  overflow: hidden;
   background: var(--bg-card);
   box-sizing: border-box;
 }
@@ -169,20 +166,32 @@ html:active-view-transition-type(backward)::view-transition-new(active-slide-bod
 
 /* Print Stylesheet for 16:9 PDF Export */
 @media print {
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   body {
     height: auto !important;
     overflow: visible !important;
-    background: transparent !important;
+    background: var(--bg-canvas) !important;
+    display: block !important;
   }
   header.deck-header,
   footer.deck-footer,
   #canvasUiParticles,
-  .video-modal {
+  .video-modal,
+  .cloth-card-canvas {
     display: none !important;
   }
   main.deck-stage {
     padding: 0 !important;
     height: auto !important;
+    display: block !important;
+    overflow: visible !important;
   }
   .slide-wrapper {
     box-shadow: none !important;
@@ -190,15 +199,26 @@ html:active-view-transition-type(backward)::view-transition-new(active-slide-bod
     max-width: 100% !important;
     max-height: none !important;
     height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
   }
   .slide {
     display: flex !important;
     opacity: 1 !important;
     position: relative !important;
-    page-break-after: always;
-    break-after: page;
-    height: 100vh !important;
-    aspect-ratio: 16 / 9 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    height: 9in !important;
+    width: 16in !important;
+    max-height: 9in !important;
+    max-width: 16in !important;
+    box-sizing: border-box !important;
+    padding: 0.8in 1in !important;
+    overflow: hidden !important;
+  }
+  .offer-box {
+    opacity: 1 !important;
   }
 }
 

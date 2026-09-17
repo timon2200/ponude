@@ -14,8 +14,8 @@
     "accent-green-bright": "#10b981",
     "accent-green-bg": "#e0f6eb",
     "accent-green-border": "#a1dcc2",
-    "font-hero": "'Syne', sans-serif",
-    "font-display": "'Unbounded', sans-serif",
+    "font-hero": "'Plus Jakarta Sans', sans-serif",
+    "font-display": "'Plus Jakarta Sans', sans-serif",
     "font-sans": "'Plus Jakarta Sans', sans-serif",
     "font-mono": "'JetBrains Mono', monospace",
     "particle-color": "#0d5c3a"

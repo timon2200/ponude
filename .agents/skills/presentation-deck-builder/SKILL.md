@@ -19,18 +19,25 @@ Ovaj skill omogućuje orkestratoru i rojevima agenata brzo i pouzdano generiranj
 
 ## 2. Ključna pravila i standardi (Zakon iz AGENTS.md)
 
-1. **CanvasUI Ekosustav (Obvezno u svim deckovima):**
+1. **Bespoke, Konzistentno Izvrstan Dizajn:**
+   - Svaki mikrosajt ima vlastiti vizualni identitet prilagođen klijentu (paleta, tipografija, detalji). Nema generic template osjećaja.
+   - Izuzetan craft: kalibriran whitespace, brutalist/editorial obrubi, mikrotipografija (`letter-spacing`, `line-height`), hardverski fluidnih 60fps.
+2. **Kondenzirane Poruke & Funkcionalan Copy (Zero Fluff):**
+   - Bez kićenja, praznih dekoracija i marketinških uvoda.
+   - Radni tekst: klijent u 3 sekunde shvaća točnu vrijednost, formate, proces i rezultat.
+   - 0 AI klišeja, bez praznih superlativa, glagoli umjesto pridjeva, bez sažimanja na kraju.
+3. **CanvasUI Ekosustav (Obvezno u svim deckovima):**
    - **Ambijentalne čestice (`#canvasUiParticles`):** 45 lebdećih čestica u pozadini sa suptilnim Brownian kretanjem, odbijanjem od miša (repulsion 120px) i naletom vjetra (`triggerCanvasUiWind`) pri navigaciji slajdova.
    - **Bayer Dither leća:** 4x4 dither canvas overlay efekt pri lebdenju iznad video kartica i vizualnih okvira.
    - **3D WebGL Cloth Physics Engine (Slajd 5):** 96×96 elastična WebGL2 mreža s fizikom valova i direktnim 2D `OffscreenCanvas` rasterizatorom tekstura (`dpr: 2`) za opcije ponude.
-2. **100% Mobilna responzivnost (< 768px):**
+4. **100% Mobilna responzivnost (< 768px):**
    - Pozornica prelazi u fluidni scroll feed.
    - Svi slajdovi (1 do 6) koriste **apsolutno ograničeni skrolajući kontejner** (`position: absolute; top:0; left:0; right:0; bottom:0; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding: 1rem 0.85rem 4rem 0.85rem;`).
    - Sve mreže prelaze u vertikalni stupac (`flex-direction: column`).
    - WebGL platno se na mobitelu skriva, a prikazuje se statična HTML kartica (`.offer-box`), osiguravajući 60fps i besprijekorno čitanje.
-3. **Zabrana Autoplaya:** Prezentacijom upravlja isključivo korisnik (nema autoplay gumba niti intervala koji sami listaju slajdove).
-4. **Signature Styling (Option B):** Preporučeni prošireni paketi na Slajdu 5 i gumbi na Slajdu 6 imaju potpisnu tamnozelenu podlogu `#0d1815` s emerald obrubom `#10b981` i zvjezdicama `★`.
-5. **Službeni kontakt:** Uvijek `timon.terzic@gmail.com`.
+5. **Zabrana Autoplaya:** Prezentacijom upravlja isključivo korisnik (nema autoplay gumba niti intervala koji sami listaju slajdove).
+6. **Signature Styling (Option B):** Preporučeni prošireni paketi na Slajdu 5 i gumbi na Slajdu 6 imaju potpisnu tamnozelenu podlogu `#0d1815` s emerald obrubom `#10b981` i zvjezdicama `★`.
+7. **Službeni kontakt:** Uvijek `timon.terzic@gmail.com`.
 
 ---
 

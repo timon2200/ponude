@@ -281,11 +281,15 @@ export function initClothCardPhysics(customRenderers = null) {
     function syncSize() {
       if (window.innerWidth <= 768) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const cw = outputCanvas.clientWidth;
-      const ch = outputCanvas.clientHeight;
-      if (cw < 30 || ch < 30) return;
+      const w = wrapEl.clientWidth;
+      const h = wrapEl.clientHeight;
+      if (w < 30 || h < 30) return;
+
+      const cw = w + BLEED * 2;
+      const ch = h + BLEED * 2;
       const targetW = Math.round(cw * dpr);
       const targetH = Math.round(ch * dpr);
+
       if (outputCanvas.width !== targetW || outputCanvas.height !== targetH || !hasValidTexture) {
         outputCanvas.width = targetW;
         outputCanvas.height = targetH;
@@ -435,8 +439,8 @@ export function initClothCardPhysics(customRenderers = null) {
     function render() {
       const resW = Math.max(wrapEl.clientWidth, 50);
       const resH = Math.max(wrapEl.clientHeight, 50);
-      const outW = Math.max(outputCanvas.clientWidth, 50);
-      const outH = Math.max(outputCanvas.clientHeight, 50);
+      const outW = resW + BLEED * 2;
+      const outH = resH + BLEED * 2;
       const dark = opts.dark || 0;
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);

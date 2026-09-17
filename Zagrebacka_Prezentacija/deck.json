@@ -1,0 +1,55 @@
+{
+  "title": "PRSTEN KOJI POKREĆE — Kinematografska kronika Zagrebačke županije",
+  "client_name": "Zagrebačka županija",
+  "slug": "zagrebacka-zupanija",
+  "theme": "editorial-canvas",
+  "header_tag": "SLUŽBENA PONUDA // 2026",
+  "contact_email": "timon.terzic@gmail.com",
+  "total": "18.000,00 € — 22.000,00 €",
+  "pdf_path": "assets/Ponuda_Zagrebacka_Zupanija_OpcijaB.pdf",
+  "issuer": {
+    "name": "STUDIO VARAŽDIN",
+    "owner": "Vl. Jasenka Martinčević",
+    "address": "S. Vraza 10, Varaždin",
+    "oib": "63287352089",
+    "partner": "Lotus RC"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "file": "slides/01_hero.html",
+      "title": "Zeleni prsten (9 gradova, 25 općina)",
+      "category": "Koncepcija & Snaga • Zagrebačka županija"
+    },
+    {
+      "id": 2,
+      "file": "slides/02_concept.html",
+      "title": "Magistrale, škole i zone",
+      "category": "Strateški projekti • Vodoopskrba, škole & logistika"
+    },
+    {
+      "id": 3,
+      "file": "slides/03_formats.html",
+      "title": "4K Master film & 4 vertikale",
+      "category": "Distribucija • Dan županije (17. srpnja)"
+    },
+    {
+      "id": 4,
+      "file": "slides/04_production.html",
+      "title": "4 faze filmske produkcije",
+      "category": "Metodologija & Tehnologija • Arhiva i FPV"
+    },
+    {
+      "id": 5,
+      "file": "slides/05_offer.html",
+      "title": "Komercijalni paketi (Opcija A vs B)",
+      "category": "Transparentna ponuda • 18.000 € vs 22.000 €"
+    },
+    {
+      "id": 6,
+      "file": "slides/06_auth.html",
+      "title": "Terminski plan & Autorizacija",
+      "category": "Rezervacija termina • 17. srpnja"
+    }
+  ]
+}

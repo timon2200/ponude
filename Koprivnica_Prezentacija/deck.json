@@ -1,0 +1,55 @@
+{
+  "title": "ZEMLJA KOJA GRADI — Filmska kronika Podravine i Prigorja | Studio Varaždin",
+  "client_name": "Koprivničko-križevačka županija & Grad Koprivnica",
+  "slug": "koprivnica",
+  "theme": "eco-utility",
+  "header_tag": "FILMSKA KRONIKA // 2026",
+  "contact_email": "timon.terzic@gmail.com",
+  "total": "14.500,00 € — 18.500,00 €",
+  "pdf_path": "assets/Ponuda_Koprivnica_Zupanija_Grad.pdf",
+  "issuer": {
+    "name": "STUDIO VARAŽDIN",
+    "owner": "Vl. Jasenka Martinčević",
+    "address": "S. Vraza 10, Varaždin",
+    "oib": "63287352089",
+    "partner": "Lotus RC"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "file": "slides/01_hero.html",
+      "title": "Zemlja koja gradi",
+      "category": "Kadar 1 • Otvaranje i teza"
+    },
+    {
+      "id": 2,
+      "file": "slides/02_concept.html",
+      "title": "5 dvorana, nova OŠ, CEKOM i koridor",
+      "category": "Ključne lokacije • Arhitektura ulaganja"
+    },
+    {
+      "id": 3,
+      "file": "slides/03_formats.html",
+      "title": "4K Master film & 3 vertikale",
+      "category": "Distribucija • Svečana sjednica i mreže"
+    },
+    {
+      "id": 4,
+      "file": "slides/04_production.html",
+      "title": "4 faze filmske produkcije",
+      "category": "Metodologija • Od inventara do ekrana"
+    },
+    {
+      "id": 5,
+      "file": "slides/05_offer.html",
+      "title": "Dvije razine ponude",
+      "category": "Komercijalna struktura • Opcija A vs Opcija B"
+    },
+    {
+      "id": 6,
+      "file": "slides/06_auth.html",
+      "title": "Terminski plan & Autorizacija",
+      "category": "Partnerski koraci • Rezervacija termina"
+    }
+  ]
+}

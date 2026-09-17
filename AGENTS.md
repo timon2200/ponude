@@ -172,22 +172,31 @@ Svaki prezentacijski mikrosajt mora implementirati sljedeći set mikro-interakci
 
 ---
 
-## 5. Copywriting i standardi naracije (SKILL.md)
+## 5. Dizajnerski manifest i standardi copywritinga
 
-Tekstovi unutar mikrosajta podliježu strogim pravilima vještine naracije (`.agents/skills/naracija/SKILL.md` ili apsolutna putanja `/Users/timonterzic/.claude/skills/naracija/SKILL.md`):
+Svaki prezentacijski mikrosajt mora zadovoljiti najviši estetski i urednički standard:
 
-1. **Zabranjene fraze:** Bez iznimke izbaciti sve AI klišee (*zaronite u, otkrijte čaroliju, predstavlja pravi dragulj, kamen temeljac, bogata povijest, jedinstveno iskustvo, spoj tradicije i suvremenosti, oaza mira, ostavlja bez daha, svjedoči o*).
-2. **Glagoli umjesto pridjeva:** Izbaciti prazne superlative (*prekrasan, revolucionaran, nevjerojatan*). Opisati radnju i proces.
-3. **Konkretne činjenice:** Imenovati ljude, lokacije, iznose, dimenzije i rokove.
-4. **Smještaj činjenice:** Jedna činjenica po odlomku, smještena u **sredinu**, nikad na sam kraj odlomka (kraj odlomka pripada slici).
-5. **Nema sažetaka:** Zabranjen zaključni odlomak koji ponavlja već rečeno.
-6. **Struktura pitcha (6 slajdova):**
-   - Slajd 1: Hrabra teza i kontrast (Stari pristup vs. Naš pristup).
-   - Slajd 2: Narativna arhitektura / Scenarij i tehnologija.
-   - Slajd 3: Formati za sve kanale (1 Master 4K + 3 Vertikale za mreže).
-   - Slajd 4: Edukativna ili poslovna metodologija.
-   - Slajd 5: Komercijalni paketi i transparentna ponuda (s 3D CanvasUI tkaninama).
-   - Slajd 6: Terminski plan, PDF download opcije i autorizacijski CTA.
+### A. Bespoke vizualni identitet i besprijekoran craft (Konzistentno izvrstan dizajn)
+- **Nema generičkih predložaka:** Svaka prezentacija ima specifičan vizualni karakter prilagođen industriji i brendu klijenta (arhitektura palete, tipografski ritam, teksture i detalji).
+- **Visoka kreativnost i autorski potpis:** Hrabar kontrast, pažljivo kalibriran whitespace, taktilni brutalistički ili editorial obrubi, savršeno poravnanje i mikro-tipografija (`letter-spacing`, `line-height`, hijerarhija).
+- **Hardverska glatkoća:** Sve interakcije i mikro-animacije moraju raditi u fluidnih 60fps bez zastoja.
+
+### B. Kondenzirane poruke i funkcionalan copy (High-Signal / Zero Fluff)
+- **Bez uljepšavanja i kićenja:** Izbaciti svaki oblik dekorativnog teksta, uvodnog filozofiranja i praznih marketinških fraza.
+- **Funkcionalan radni tekst:** Klijent u 3 sekunde čitanja mora shvatiti točnu vrijednost, format, proces i rezultat. Tekst mora biti operativan, tehnički točan i izravan.
+- **Jedna kristalna teza po slajdu:** Svaki slajd komunicira točno jednu ključnu poruku, potkrijepljenu konkretnim brojkama, deliverablima ili komparacijama.
+- **Stroga zabrana AI klišeja:** Bez iznimke izbaciti sve AI formulacije (*zaronite u, otkrijte čaroliju, predstavlja pravi dragulj, kamen temeljac, bogata povijest, jedinstveno iskustvo, spoj tradicije i suvremenosti, oaza mira, ostavlja bez daha, svjedoči o*).
+- **Glagoli umjesto pridjeva:** Izbaciti prazne superlative (*prekrasan, revolucionaran, vrhunski*). Opisati radnju, mehanizam i materijalni rezultat.
+- **Smještaj činjenice:** Jedna činjenica po odlomku, smještena u **sredinu**, nikad na sam kraj (kraj pripada slici ili akciji).
+- **Bez sažetaka:** Zabranjen zaključni odlomak koji ponavlja već rečeno.
+
+### C. Narativna struktura pitcha (6 slajdova)
+- **Slajd 1:** Hrabra teza i kontrast (Stari pristup vs. Naš pristup).
+- **Slajd 2:** Narativna arhitektura / Scenarij i tehnologija.
+- **Slajd 3:** Formati za sve kanale (1 Master 4K + 3 Vertikale za mreže).
+- **Slajd 4:** Edukativna ili poslovna metodologija.
+- **Slajd 5:** Komercijalni paketi i transparentna ponuda (s 3D CanvasUI tkaninama).
+- **Slajd 6:** Terminski plan, PDF download opcije i autorizacijski CTA.
 
 ---
 

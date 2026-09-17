@@ -1,0 +1,55 @@
+{
+  "title": "DVORAC I KAMPUS — Kinematografski film Svete Nedelje",
+  "client_name": "Grad Sveta Nedelja & Zagrebačka županija",
+  "slug": "sveta-nedelja",
+  "theme": "editorial-canvas",
+  "header_tag": "SLUŽBENI PITCH // KINEMATOGRAFSKI FILM",
+  "contact_email": "timon.terzic@gmail.com",
+  "total": "15.000,00 € — 19.500,00 €",
+  "pdf_path": "assets/Ponuda_Sveta_Nedelja_OpcijaB_19500.pdf",
+  "issuer": {
+    "name": "STUDIO VARAŽDIN",
+    "owner": "Vl. Jasenka Martinčević",
+    "address": "S. Vraza 10, Varaždin",
+    "oib": "63287352089",
+    "partner": "Lotus RC"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "file": "slides/01_hero.html",
+      "title": "Autorski dvojac: Dvorac i Kampus",
+      "category": "Autorski kolektiv • Studio Varaždin"
+    },
+    {
+      "id": 2,
+      "file": "slides/02_concept.html",
+      "title": "Dvije točke: Erdödy i Rimac",
+      "category": "Koncept filma • Dvojnost epohe"
+    },
+    {
+      "id": 3,
+      "file": "slides/03_formats.html",
+      "title": "4K Master i 4 vertikale",
+      "category": "Format isporuke • Dan grada i Županije"
+    },
+    {
+      "id": 4,
+      "file": "slides/04_production.html",
+      "title": "4 stupa kinematske produkcije",
+      "category": "Produkcija • FPV i anamorfička optika"
+    },
+    {
+      "id": 5,
+      "file": "slides/05_offer.html",
+      "title": "Komercijalna ponuda (Opcija A i B)",
+      "category": "Komercijalna ponuda • Sveta Nedelja"
+    },
+    {
+      "id": 6,
+      "file": "slides/06_auth.html",
+      "title": "Terminski plan i potvrda",
+      "category": "Terminski plan & Autorizacija"
+    }
+  ]
+}
