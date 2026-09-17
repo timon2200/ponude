@@ -14,6 +14,8 @@ Prezentacijski mikrosajtovi predstavljaju najviši rang digitalne komunikacije s
 - **Zero-Dependency Vanilla arhitektura:** Isključivo čisti HTML5, CSS3 i moderni ES6+ JavaScript. Nema npm paketa, nema React/Vue overheada, nema vanjskih build koraka koji bi mogli zastarjeti ili puknuti.
 - **Instantno učitavanje i 60fps:** Sve animacije i prijelazi moraju biti hardverski ubrzani (`transform: translate3d/scale`, `opacity`).
 - **Puna samostalnost:** Cjelokupan mikrosajt funkcionira unutar jedne mape (`website/<slug>/`), spreman za cPanel Git deployment.
+- **Zabrana automatske reprodukcije (No Autoplay):** Prezentacijom upravlja isključivo korisnik (tipkovnica, klik, gesta). Nema autoplay gumba niti automatskih tajmera koji preskaču slajdove.
+- **Službeni kontakt e-mail:** U svim pitch prezentacijama, predlošcima i mailto linkovima koristi se isključivo `timon.terzic@gmail.com`.
 
 ---
 
@@ -29,7 +31,7 @@ varazdin.studio/
 │   │
 │   ├── <client-slug>/          # PREZENTACIJSKI MIKROSAJT KLIJENTA
 │   │   ├── index.html          # Glavni interaktivni deck (samostalan)
-│   │   ├── assets/             # Slike visoke razlučivosti, logo, video, fontovi
+│   │   ├── assets/             # Slike visoke razlučivosti, logo, video, fontovi, PDF ponude
 │   │   └── api/                # Opcionalni mikro-PHP endpointi (npr. vote.php, feedback.php)
 ```
 
@@ -118,11 +120,15 @@ Svaki prezentacijski mikrosajt mora implementirati sljedeći set mikro-interakci
 
 ### 1. Fiksna 16:9 pozornica i mobilna responzivnost
 - **Desktop:** Fiksni 16:9 omjer (`aspect-ratio: 16 / 9; max-height: calc(100vh - 135px);`), savršeno centriran s 2px brutalist obrubom i taktilnom sjenom (`box-shadow: 8px 8px 0px rgba(13, 24, 21, 0.16)`).
-- **Mobile (< 768px):** Automatski prelazak u vertikalni fluidni scroll feed bez fiksnog omjera, s prilagođenom tipografijom i karticama u jednom stupcu.
+- **Mobile (< 768px):** 
+  - Automatski prelazak pozornice u fluidni scroll feed bez fiksnog omjera.
+  - Svi slajdovi (1 do 6) koriste **apsolutno ograničeni skrolajući kontejner** (`position: absolute; top:0; left:0; right:0; bottom:0; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding: 1rem 0.85rem 4rem 0.85rem;`).
+  - Sve mreže (`.grid-2col`, `.grid-3col`, `.dual-offers-grid`, `.offer-package-grid`, `.slide-actions-grid`) prelaze u vertikalni stupac (`flex-direction: column; width: 100%; height: auto;`).
+  - Ništa ne smije biti odrezano niti nedostupno za skrolanje.
 
 ### 2. Centrirani Liquid Morphing Pill Indikator
 - Paginacijska traka u podnožju je **apsolutno fiksirana u središtu ekrana** (`left: 50%; transform: translate(-50%, -50%)`), čime se sprječava bilo kakvo pomicanje pri promjeni naslova slajda na lijevoj strani.
-- Glider kapsula (`.nav-pill`) izvodi smjerno stiskanje i rastezanje (`@keyframes squishForward` / `squishBackward`) s glatkim sheen svjetlosnim sweepom.
+- Glider kapsula (`.nav-pill` / `.slide-dot.active`) izvodi smjerno stiskanje i rastezanje (`@keyframes squishForward` / `squishBackward`) s glatkim sheen svjetlosnim sweepom.
 - Pregledani slajdovi zadržavaju decentnu toniranu boju (`.visited`).
 
 ### 3. Micro-Interaction Hover Tooltips
@@ -138,25 +144,31 @@ Svaki prezentacijski mikrosajt mora implementirati sljedeći set mikro-interakci
 - Navigacija tipkovnicom (`←` / `→`, `Space`, `Enter`, `PageUp` / `PageDown`, `1`–`6`, `F` za fullscreen, `M` za zvuk).
 - Pritiskom na tipkovničke strelice, gumbi na ekranu (`btnPrev`, `btnNext`) vidljivo se utiskuju (`transform: translate(2.5px, 2.5px)`).
 
-### 7. CanvasUI grafički slojevi
-- **Ambijentalne čestice:** Lebdeće mikro-čestice u pozadini s fizikom odbijanja od miša i naletom vjetra (`triggerCanvasUiWind`) pri promjeni slajdova.
-- **Bayer Dither leća:** 4x4 Bayer dithering efekt pri prelasku mišem preko kartica i vizuala.
+### 7. CanvasUI Ambijentalne Čestice (`#canvasUiParticles`)
+- Fiksno pozadinsko platno (`canvas#canvasUiParticles`) sa z-indexom iza sadržaja (`z-index: 2`).
+- 45 mikro-čestica koje lebde s prirodnim Brownian šumom, blago bježe od kursora miša (repulsion radijus 120px) i dobivaju snažno horizontalno ubrzanje vjetra (`triggerCanvasUiWind`) pri svakoj promjeni slajda.
 
-### 8. Obvezni Hero PDF Download i Autorizacijski blok (Slajd 6)
-- **Dvostruka akcijska mreža (`.slide-actions-grid`):**
-  1. **Veliki brutalistički gumb za preuzimanje službene PDF ponude (`.btn-pdf-hero`):** Povezan izravno s PDF dokumentom ponude iz `Ponude.app` pohranjenim u `assets/`, s prikazom broja ponude, točnog iznosa i A4 specifikacije.
-  2. **Gumb za direktnu autorizaciju / prihvat ponude (`.btn-auth-hero`):** Otvara pripremljenu e-mail poruku za potvrdu projekta i rezervaciju termina snimanja.
-  3. **Izdavatelj i pravni podaci studija (`.issuer-footer-meta`):** Navedeni u podnožju slajda.
+### 8. CanvasUI Bayer Dither Leća (Retro Dither)
+- 4x4 Bayer dithering efekt pri prelasku mišem preko video kartica i vizualnih okvira, stvarajući prepoznatljiv analogni Studio Varaždin vizualni potpis bez dodatnih biblioteka.
 
-### 9. CanvasUI 3D WebGL Cloth & Dynamic Physics Engine (Zastave, Viseći paketi, Tkanine)
-- **Zero-Dependency WebGL2 Arhitektura:** 96×96 mreža (18.432 trokuta) s fizikom valova i prigušenja, sjenčanjem i SDF obrezivanjem.
-- **Direct 2D Canvas Rasterizacija:** Tekstura se generira preko 2D `OffscreenCanvasa` u dvostrukoj rezoluciji (`dpr: 2`) i prosljeđuje u `gl.texImage2D` u 0ms, čime se eliminiraju CORS i SVG blokade.
-- **Podržani modovi sidrenja:**
-  - `pin: 'top'` — Viseći paketi ponude i cjenici s gravitacijskim objesom.
-  - `pin: 'left'` — Vijorenje zastava na jarbolu (gradske, državne, korporativne).
-  - `pin: 'corners'` — Zategnuta elastična platna i interaktivni panoi.
-- **Sigurnosni lifecycle:** `MutationObserver` aktivira WebGL i `resize()` točno u trenutku prijelaza na slajd, uz Zero-Size Guard (`w < 30px`) koji sprječava rušenje na skrivenim slajdovima.
-- **Detaljni blueprint i shader kod:** `.agents/skills/presentation-deck-builder/resources/CANVAS_UI_CLOTH_ENGINE.md`.
+### 9. CanvasUI 3D WebGL Cloth & Dynamic Physics Engine (Slajd 5)
+- **Zero-Dependency WebGL2 Arhitektura:** 96×96 mreža (18.432 trokuta) s fizikom valova i prigušenja, difuznim sjenčanjem, spekularnim svjetlom i SDF obrezivanjem.
+- **Direct 2D Canvas Rasterizacija:** Teksture za kartice opcija (npr. Option A i Option B) renderiraju se u memoriji preko 2D `OffscreenCanvasa` u dvostrukoj rezoluciji (`dpr: 2`) i prosljeđuju u `gl.texImage2D` u 0ms, čime se eliminiraju CORS i SVG blokade.
+- **Signature Dark Green Styling za Preporučenu Opciju (Option B):**
+  - Pozadina: `#0d1815` (duboka antracit/zelena)
+  - Obrub: `#10b981` (emerald green) s brutalist sjenom `6px 6px 0px var(--accent-green)`
+  - Značka: `#10b981` pozadina s tamnim tekstom `#0d1815` i bijelim obrubom
+  - Zvjezdice: `★` u `#10b981` / `#7de095`
+  - Donji boks s cijenom: `#13231e` sa zelenim akcentnim tekstom
+- **Graceful Mobile Fallback:** Na mobilnim uređajima (`< 768px`) WebGL platno se skriva (`display: none`), a prikazuje se čisti, savršeno čitljivi HTML element (`.offer-box`), osiguravajući 100% responzivnost bez usporavanja.
+- **Sigurnosni lifecycle:** `MutationObserver` aktivira WebGL i `resize()` točno u trenutku prijelaza na slajd 5, uz Zero-Size Guard (`w < 30px`) koji sprječava rušenje na skrivenim slajdovima.
+
+### 10. Obvezni PDF Download i Autorizacijski blok (Slajd 6)
+- **Dvostruka ili pojedinačna preuzimanja ponuda:**
+  - **Za ponude s više opcija:** `.pdf-download-grid` s dva odvojena brutalistička gumba — Option A (`.btn-pdf-download`) i Option B (`.btn-pdf-download.signature-dl`).
+  - **Za pojedinačne ponude:** Veliki hero gumb (`.btn-pdf-hero`) s A4 specifikacijom i iznosom.
+- **Gumb za direktnu autorizaciju / prihvat ponude (`.btn-auth-hero` / `.btn-auth-action`):** Otvara pripremljenu e-mail poruku prema `timon.terzic@gmail.com` za potvrdu projekta i rezervaciju termina snimanja.
+- **Izdavatelj i pravni podaci studija (`.issuer-footer-meta` / `.contact-grid`):** Navedeni u podnožju slajda.
 
 ---
 
@@ -174,8 +186,8 @@ Tekstovi unutar mikrosajta podliježu strogim pravilima vještine naracije (`.ag
    - Slajd 2: Narativna arhitektura / Scenarij i tehnologija.
    - Slajd 3: Formati za sve kanale (1 Master 4K + 3 Vertikale za mreže).
    - Slajd 4: Edukativna ili poslovna metodologija.
-   - Slajd 5: Komercijalni paketi i transparentna ponuda (vezana uz Ponude.app).
-   - Slajd 6: Terminski plan, veliki PDF download gumb i autorizacijski CTA.
+   - Slajd 5: Komercijalni paketi i transparentna ponuda (s 3D CanvasUI tkaninama).
+   - Slajd 6: Terminski plan, PDF download opcije i autorizacijski CTA.
 
 ---
 
@@ -188,8 +200,8 @@ graph TD
     A[Ponuda: Ponude.app API / PDF] --> B[Subagent 1: Ponude Extractor]
     B -->|Strukturirani JSON stavki i cijena| C[Subagent 2: Pitch Strategist & Narator]
     C -->|Odobren tekst bez AI fraza| D[Subagent 3: Theme & Frontend Architect]
-    D -->|16:9 Zero-Dependency HTML/CSS/JS| E[Subagent 4: QA Auditor & Validator]
-    E -->|Validacija: Glider, Haptika, Odometer, Dijakritici| F[Subagent 5: Deployment Hook]
+    D -->|16:9 Zero-Dependency HTML/CSS/JS + CanvasUI| E[Subagent 4: QA Auditor & Validator]
+    E -->|Validacija: CanvasUI, Glider, Haptika, Odometer, Mobilnost| F[Subagent 5: Deployment Hook]
     F -->|Git Push| G[varazdin.studio/website/<client-slug>/]
 ```
 
@@ -202,7 +214,7 @@ Ponude/
 │   │   ├── css/                                # variables.css, base.css, header.css, footer.css, components.css, modal.css, mobile.css
 │   │   ├── js/                                 # audio.js, odometer.js, modal.js, particles.js, cloth.js, navigation.js
 │   │   └── templates/
-│   │       ├── layout.html                     # Master HTML kostur s placeholderima
+│   │       ├── layout.html                     # Master HTML kostur s placeholderima (CanvasUI integriran)
 │   │       └── default_slides/                 # 01_hero.html ... 06_auth.html
 │   └── themes/                                 # eco-utility.json, editorial-canvas.json, dark-luxury.json
 │
@@ -210,7 +222,7 @@ Ponude/
 │   ├── build_deck.py                           # BRZI COMPILER (deck.json + slides/*.html -> index.html)
 │   ├── orchestrate_presentation.py             # Master CLI orkestrator (Ekstrakcija + Scaffolding + Build + QA)
 │   ├── fetch_ponuda.py                         # Ekstrakcija ponude iz API-ja ili PDF-a
-│   ├── generate_deck.py                        # Generator modularnog workspacea
+│   ├── generate_deck.py                        # Generator modularnog workspacea s CanvasUI modulima
 │   └── validate_deck.py                        # QA auditor usklađenosti
 │
 ├── Meridian16_Prezentacija/                    # MODULARNI WORKSPACE KLIJENTA
@@ -222,8 +234,8 @@ Ponude/
 │   │   ├── 04_production.html
 │   │   ├── 05_offer.html
 │   │   └── 06_auth.html
-│   ├── custom.css                              # Specifični stilovi prezentacije (opcionalno)
-│   ├── custom.js                               # Specifični skriptovi / WebGL cloth teksture (opcionalno)
+│   ├── custom.css                              # Stilovi kartica, signature box (#0d1815) i download mreže
+│   ├── custom.js                               # WebGL cloth teksture (2D high-DPR rasterizacija)
 │   ├── index.html                              # Kompajlirani samostalni zero-dependency HTML
 │   └── slike/ / assets/                        # Slike i službeni PDF-ovi
 │
@@ -257,4 +269,5 @@ python3 /Users/timonterzic/Documents/Ponude/scripts/orchestrate_presentation.py 
 ```bash
 python3 /Users/timonterzic/Documents/Ponude/scripts/validate_deck.py "/Users/timonterzic/Documents/Ponude/Meridian16_Prezentacija/index.html"
 ```
+
 

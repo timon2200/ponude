@@ -17,9 +17,26 @@ Ovaj skill omogućuje orkestratoru i rojevima agenata brzo i pouzdano generiranj
 
 ---
 
-## 2. Agent-First Modularna Arhitektura
+## 2. Ključna pravila i standardi (Zakon iz AGENTS.md)
 
-Prezentacije su organizirane u **čiste modularne komponente**, a ne u monolitne datoteke od 4.000 linija:
+1. **CanvasUI Ekosustav (Obvezno u svim deckovima):**
+   - **Ambijentalne čestice (`#canvasUiParticles`):** 45 lebdećih čestica u pozadini sa suptilnim Brownian kretanjem, odbijanjem od miša (repulsion 120px) i naletom vjetra (`triggerCanvasUiWind`) pri navigaciji slajdova.
+   - **Bayer Dither leća:** 4x4 dither canvas overlay efekt pri lebdenju iznad video kartica i vizualnih okvira.
+   - **3D WebGL Cloth Physics Engine (Slajd 5):** 96×96 elastična WebGL2 mreža s fizikom valova i direktnim 2D `OffscreenCanvas` rasterizatorom tekstura (`dpr: 2`) za opcije ponude.
+2. **100% Mobilna responzivnost (< 768px):**
+   - Pozornica prelazi u fluidni scroll feed.
+   - Svi slajdovi (1 do 6) koriste **apsolutno ograničeni skrolajući kontejner** (`position: absolute; top:0; left:0; right:0; bottom:0; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding: 1rem 0.85rem 4rem 0.85rem;`).
+   - Sve mreže prelaze u vertikalni stupac (`flex-direction: column`).
+   - WebGL platno se na mobitelu skriva, a prikazuje se statična HTML kartica (`.offer-box`), osiguravajući 60fps i besprijekorno čitanje.
+3. **Zabrana Autoplaya:** Prezentacijom upravlja isključivo korisnik (nema autoplay gumba niti intervala koji sami listaju slajdove).
+4. **Signature Styling (Option B):** Preporučeni prošireni paketi na Slajdu 5 i gumbi na Slajdu 6 imaju potpisnu tamnozelenu podlogu `#0d1815` s emerald obrubom `#10b981` i zvjezdicama `★`.
+5. **Službeni kontakt:** Uvijek `timon.terzic@gmail.com`.
+
+---
+
+## 3. Agent-First Modularna Arhitektura
+
+Prezentacije su organizirane u **čiste modularne komponente**, a ne u monolitne datoteke:
 
 ```
 Ponude/
@@ -38,15 +55,15 @@ Ponude/
 │   │   ├── 04_production.html
 │   │   ├── 05_offer.html
 │   │   └── 06_auth.html
-│   ├── custom.css                   # Opcionalni stilski overrides
-│   ├── custom.js                    # Opcionalne WebGL cloth teksture
+│   ├── custom.css                   # Stilovi kartica, signature box (#0d1815) i download mreže
+│   ├── custom.js                    # WebGL cloth teksture (2D high-DPR rasterizacija)
 │   ├── index.html                   # Kompajlirani standalone zero-dependency bundle (2.5ms)
 │   └── assets/ / slike/             # Fotografije, video thumbovi i PDF-ovi
 ```
 
 ---
 
-## 3. Brze Naredbe za Agente
+## 4. Brze Naredbe za Agente
 
 ### A. Uređivanje postojećeg decka:
 1. Otvori i uredi samo specifični slajd, npr. `Meridian16_Prezentacija/slides/02_concept.html` ili `deck.json`.
@@ -82,7 +99,7 @@ Dostupne teme:
 
 ---
 
-## 4. QA Audit i Validacija
+## 5. QA Audit i Validacija
 
 Prije svakog git pusha provjeri usklađenost:
 ```bash
@@ -95,10 +112,11 @@ Provjere uključuju:
 - Web Audio API haptiku i CanvasUI ambijentalne čestice
 - Mobilno responzivno vertikalno skrolanje
 - Usklađenost s `naracija/SKILL.md` (0 AI klišeja, točne činjenice i dijakritici)
+- Nepostojanje autoplaya i ispravan kontakt e-mail
 
 ---
 
-## 5. Objava na varazdin.studio
+## 6. Objava na varazdin.studio
 
 Nakon što je kompajlirana prezentacija (`--deploy` flag je automatski postavlja u `varazdin.studio/website/<slug>/`):
 ```bash
@@ -111,5 +129,6 @@ cPanel deployment automatski postavlja stranicu na `https://varazdin.studio/<cli
 
 ---
 
-## 6. Resursi i specijalizirani mehanizmi
+## 7. Resursi i specijalizirani mehanizmi
 - **[CanvasUI 3D WebGL Cloth Blueprint](file:///Users/timonterzic/Documents/Ponude/.agents/skills/presentation-deck-builder/resources/CANVAS_UI_CLOTH_ENGINE.md):** Kompletna arhitektura, shaderski kod, parametri i primjeri za viseće kartice i zastave na jarbolu.
+

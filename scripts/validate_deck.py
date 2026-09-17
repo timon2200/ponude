@@ -98,7 +98,19 @@ def validate_presentation(file_path):
     else:
         print("✓ Naracija audit passed: Zero AI clichés detected.")
 
-    # 6. Check Diacritics
+    # 6. Check Absence of Autoplay (Strict Rule)
+    if "btnAutoplay" in html or "toggleAutoplay" in html:
+        errors.append("Autoplay detected: Autoplay buttons and loops are forbidden in client pitch decks.")
+    else:
+        print("✓ Autoplay check passed: User-driven interactive navigation.")
+
+    # 7. Check Standard Contact Email
+    if "timon.terzic@gmail.com" not in html:
+        warnings.append("Expected official contact email timon.terzic@gmail.com.")
+    else:
+        print("✓ Official contact email verified (timon.terzic@gmail.com).")
+
+    # 8. Check Diacritics
     has_croatian_chars = any(c in html for c in ['č', 'ć', 'ž', 'š', 'đ', 'Č', 'Ć', 'Ž', 'Š', 'Đ'])
     if not has_croatian_chars:
         warnings.append("No Croatian diacritics found (ensure proper localized spelling).")
@@ -122,6 +134,7 @@ def validate_presentation(file_path):
     return True
 
 if __name__ == '__main__':
-    target = sys.argv[1] if len(sys.argv) > 1 else "/Users/timonterzic/Documents/Ponude/Komunalni_Prezentacija/index.html"
+    target = sys.argv[1] if len(sys.argv) > 1 else "/Users/timonterzic/Documents/Ponude/Meridian16_Prezentacija/index.html"
     success = validate_presentation(target)
     sys.exit(0 if success else 1)
+

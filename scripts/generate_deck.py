@@ -122,52 +122,630 @@ def generate_presentation_workspace(offer_data, theme="eco-utility", target_dir=
         if not dest_file.exists():
             shutil.copy(s_file, dest_file)
 
-    # 3. Generate Offer Rows HTML for Slide 5
-    offer_rows_html = []
-    for item in items:
-        title = item.get("title", "")
-        desc = item.get("description", "")
-        price = item.get("price", "")
-        offer_rows_html.append(f"""        <div class="offer-item-row" style="background:var(--bg-card); border:2px solid var(--border-dark); border-radius:6px; padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-          <div>
-            <div class="offer-item-title" style="font-family:var(--font-hero); font-size:1rem; font-weight:800;">{title}</div>
-            <div class="offer-item-desc" style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">{desc}</div>
-          </div>
-          <div class="offer-item-price" style="font-family:var(--font-mono); font-weight:800; font-size:1rem; margin-left:1rem; white-space:nowrap;">{price}</div>
-        </div>""")
-    
-    slide5_custom = f"""<section class="slide" data-slide="5" data-index="5" data-title="Komercijalna Ponuda">
-  <div>
-    <div class="category-badge-row">
-      <span class="category-badge">Ponuda br. {offer_num} • {offer_date}</span>
-      <span class="meta-coords">STRUKTURA ULAGANJA // {client_name.upper()}</span>
-    </div>
-    <h2 class="quote-title">TRANSPARENTNA <br><span class="outline-text">RAŠČLAMBA ULAGANJA</span></h2>
-    <p class="quote-sub">Puni opseg angažmana i isporuka.</p>
-  </div>
+    # 3. Create Default custom.css if not present
+    custom_css_path = target_dir / "custom.css"
+    if not custom_css_path.exists():
+        default_custom_css = """/* ======================================================== */
+/* PRESENTATION CUSTOM STYLES & CANVAS UI                   */
+/* ======================================================== */
 
-  <div class="offer-package-grid" style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:1.5rem; margin-top:0.75rem;">
-    <div class="offer-main-card">
-{chr(10).join(offer_rows_html)}
-    </div>
-    <div class="offer-total-box" style="background:var(--accent-green-bg); border:2px solid var(--accent-green); border-radius:6px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:4px 4px 0px var(--accent-green);">
-      <div class="offer-total-header">
-        <span style="font-family:var(--font-mono); font-size:0.8rem; font-weight:800; color:var(--accent-green); display:block;">UKUPNO ZA PLAĆANJE</span>
-        <span class="price" style="font-family:var(--font-hero); font-size:2.2rem; font-weight:900; color:var(--accent-green);">{total_price}</span>
-      </div>
-      <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary); line-height:1.45; border-top:1px dashed var(--accent-green-border); padding-top:0.6rem; margin-top:0.6rem;">
-        • Oslobođeno PDV-a temeljem članka 90. st. 2 Zakona o PDV-u.<br>
-        • Neograničena autorska prava korištenja.<br>
-        • Rok valjanosti ponude: 30 dana.
-      </div>
-    </div>
-  </div>
-</section>"""
-    
-    with open(slides_dir / "05_offer.html", "w", encoding="utf-8") as f:
-        f.write(slide5_custom)
+.slide-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--text-primary);
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.85rem;
+}
 
-    # 4. Compile Deck
+.slide-meta-top .category {
+  color: var(--accent-green);
+  background: var(--accent-green-bg);
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--accent-green-border);
+}
+
+.punchy-narration {
+  font-family: var(--font-sans);
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-bottom: 1rem;
+}
+
+.media-frame-bold {
+  position: relative;
+  background: #000;
+  border: 2px solid var(--text-primary);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0px var(--text-primary);
+  height: 100%;
+  min-height: 280px;
+}
+
+.media-frame-bold img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Slide 5 Dual Offers Grid with CanvasUI Cloth */
+.dual-offers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.cloth-card-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+}
+
+.cloth-card-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.offer-box {
+  border: 2px solid var(--text-primary);
+  border-radius: 8px;
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+  transition: opacity 0.4s ease;
+}
+
+.offer-box.cloth-active {
+  opacity: 0;
+}
+
+.offer-box.essential {
+  background: var(--bg-card-subtle);
+  box-shadow: 4px 4px 0px var(--text-primary);
+}
+
+.offer-box.signature {
+  background: #0d1815;
+  color: #ffffff;
+  border: 2px solid #10b981;
+  box-shadow: 6px 6px 0px var(--accent-green);
+}
+
+.tier-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: var(--text-primary);
+  color: #ffffff;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+
+.offer-box.essential .tier-badge {
+  background: var(--bg-card);
+  border: 1.5px solid var(--text-primary);
+  color: var(--text-primary);
+}
+
+.offer-box.signature .tier-badge {
+  background: #10b981;
+  color: #0d1815;
+  border: 1.5px solid #ffffff;
+  font-weight: 900;
+}
+
+.tier-title {
+  font-family: var(--font-hero);
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.0;
+  margin-bottom: 0.4rem;
+}
+
+.offer-box.signature .tier-title {
+  color: #ffffff;
+}
+
+.tier-desc {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin-bottom: 0.8rem;
+}
+
+.offer-box.essential .tier-desc {
+  color: var(--text-secondary);
+}
+
+.offer-box.signature .tier-desc {
+  color: #9cb1a8;
+}
+
+.tier-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.tier-features li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.offer-box.essential .tier-features li {
+  color: var(--text-primary);
+}
+
+.offer-box.signature .tier-features li {
+  color: #ffffff;
+}
+
+.tier-features .bullet {
+  font-weight: 900;
+  font-family: var(--font-mono);
+}
+
+.offer-box.essential .tier-features .bullet {
+  color: var(--accent-green);
+}
+
+.offer-box.signature .tier-features .bullet {
+  color: #10b981;
+}
+
+.tier-price-row {
+  border-top: 1.5px solid var(--border-color);
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.offer-box.signature .tier-price-row {
+  border-top: 1.5px dashed rgba(16, 185, 129, 0.35);
+}
+
+.tier-price-row .price-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.offer-box.essential .tier-price-row .price-label {
+  color: var(--text-muted);
+}
+
+.offer-box.signature .tier-price-row .price-label {
+  color: #10b981;
+}
+
+.tier-price-row .price-val {
+  font-family: var(--font-hero);
+  font-size: 1.85rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.offer-box.essential .tier-price-row .price-val {
+  color: var(--text-primary);
+}
+
+.offer-box.signature .tier-price-row .price-val {
+  color: #ffffff;
+}
+
+.tier-price-row .vat-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.offer-box.essential .tier-price-row .vat-text {
+  color: var(--text-muted);
+}
+
+.offer-box.signature .tier-price-row .vat-text {
+  color: #10b981;
+}
+
+/* Slide 6 PDF Download & Contact Grid */
+.pdf-download-card {
+  background: var(--bg-card);
+  border: 2px solid var(--text-primary);
+  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.55rem;
+  box-shadow: 3px 3px 0px var(--text-primary);
+}
+
+.pdf-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.pdf-card-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pdf-spec-badge {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-card-subtle);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.pdf-download-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-pdf-download {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 9px;
+  border: 2px solid var(--text-primary);
+  border-radius: 5px;
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  box-shadow: 2px 2px 0px var(--text-primary);
+  transition: all 0.15s ease;
+}
+
+.btn-pdf-download:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 4px 4px 0px var(--text-primary) !important;
+  background: var(--accent-green-bg);
+}
+
+.btn-pdf-download.signature-dl {
+  border: 2px solid var(--accent-green-bright);
+  border-radius: 5px;
+  background: #0a0e12;
+  color: #ffffff;
+  box-shadow: 2px 2px 0px var(--accent-green);
+}
+
+.btn-pdf-download.signature-dl:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 5px 5px 0px var(--accent-green) !important;
+  background: #000000;
+}
+
+.btn-dl-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dl-quote-num {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 800;
+  color: var(--accent-green);
+}
+
+.btn-pdf-download.signature-dl .dl-quote-num {
+  color: #7de095;
+}
+
+.dl-quote-title {
+  font-family: var(--font-hero);
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.btn-pdf-download.signature-dl .dl-quote-title {
+  color: #ffffff;
+}
+
+.dl-quote-sub {
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.btn-pdf-download.signature-dl .dl-quote-sub {
+  color: #9cb3a2;
+}
+
+.pdf-auth-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.6rem;
+}
+
+.schedule-text {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.btn-auth-action {
+  background: var(--text-primary);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-auth-action:hover {
+  background: var(--accent-green);
+}
+"""
+        with open(custom_css_path, "w", encoding="utf-8") as f:
+            f.write(default_custom_css)
+
+    # 4. Create Default custom.js (WebGL Cloth Texture Renderers) if not present
+    custom_js_path = target_dir / "custom.js"
+    if not custom_js_path.exists():
+        default_custom_js = f"""// Presentation Custom Scripts & WebGL Cloth Card Texture Renderers
+
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {{
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
+}}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {{
+  const words = text.split(' ');
+  let line = '';
+  for (let n = 0; n < words.length; n++) {{
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {{
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    }} else {{
+      line = testLine;
+    }}
+  }}
+  ctx.fillText(line, x, y);
+}}
+
+function renderCardTextureA(canvas, w, h, dpr) {{
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#111518';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 1, 1, w - 2, h - 2, 12, true, true);
+
+  ctx.fillStyle = '#111518';
+  roundRect(ctx, 22, 20, 195, 24, 4, true, false);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 10.5px "JetBrains Mono", monospace';
+  ctx.fillText('OPCIJA A • STANDARD', 30, 36);
+
+  ctx.fillStyle = '#111518';
+  ctx.font = '900 20px "Syne", sans-serif';
+  ctx.fillText('STANDARDNI', 22, 65);
+  ctx.fillText('PAKET', 22, 86);
+
+  ctx.fillStyle = '#3b454e';
+  ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+  wrapText(ctx, 'Filmsko snimanje, 4K Master, dinamični FPV kadrovi i vertikale za mreže.', 22, 105, w - 44, 16);
+
+  ctx.strokeStyle = '#d5ccba';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(22, 140);
+  ctx.lineTo(w - 22, 140);
+  ctx.stroke();
+
+  const features = [
+    ['1 Master Filmski Rez (4K)', ' (16:9 Cinema Master)'],
+    ['3x Vertikalna Video Reelsa', ' (LinkedIn & Instagram)'],
+    ['FPV Zračne Sekvence', ' + Puni tlocrt lokacije'],
+    ['Predprodukcija & Scenarij', ' (Knjiga snimanja i priprema)'],
+    ['100% Prijenos Autorskih Prava', ' klijentu']
+  ];
+
+  const startY = 162;
+  const featSpacing = 26;
+
+  features.forEach(([bold, norm], idx) => {{
+    const featY = startY + idx * featSpacing;
+    ctx.fillStyle = '#11421f';
+    ctx.font = '800 13px "JetBrains Mono", monospace';
+    ctx.fillText('✓', 24, featY);
+
+    ctx.fillStyle = '#111518';
+    ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
+    const boldW = ctx.measureText(bold).width;
+    ctx.fillText(bold, 44, featY);
+
+    ctx.fillStyle = '#3b454e';
+    ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(norm, 44 + boldW, featY);
+  }});
+
+  const boxH = 72;
+  const boxY = h - boxH - 18;
+
+  ctx.fillStyle = '#f4efe4';
+  ctx.strokeStyle = '#d5ccba';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, 16, boxY, w - 32, boxH, 8, true, true);
+
+  ctx.fillStyle = '#79828a';
+  ctx.font = '800 9.5px "JetBrains Mono", monospace';
+  ctx.fillText('UKUPNO ULAGANJE (OPCIJA A)', 28, boxY + 20);
+
+  ctx.fillStyle = '#111518';
+  ctx.font = '900 26px "Syne", sans-serif';
+  ctx.fillText('{total_price}', 28, boxY + 46);
+
+  ctx.fillStyle = '#79828a';
+  ctx.font = '600 9.5px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Oslobođeno PDV-a (Čl. 90. st. 2) • 0% PDV', 28, boxY + 62);
+}}
+
+function renderCardTextureB(canvas, w, h, dpr) {{
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#0d1815';
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 2.5;
+  roundRect(ctx, 1, 1, w - 2, h - 2, 12, true, true);
+
+  const grad = ctx.createRadialGradient(w - 60, 40, 10, w - 60, 40, 260);
+  grad.addColorStop(0, 'rgba(16, 185, 129, 0.16)');
+  grad.addColorStop(1, 'rgba(13, 24, 21, 0)');
+  ctx.fillStyle = grad;
+  roundRect(ctx, 2, 2, w - 4, h - 4, 11, true, false);
+
+  ctx.fillStyle = '#10b981';
+  roundRect(ctx, 22, 20, 275, 24, 4, true, false);
+  ctx.fillStyle = '#0d1815';
+  ctx.font = '900 10.5px "JetBrains Mono", monospace';
+  ctx.fillText('OPCIJA B • FULL VISION (PREPORUKA)', 30, 36);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 20px "Syne", sans-serif';
+  ctx.fillText('FULL VISION', 22, 65);
+  ctx.fillText('PAKET ★', 22, 86);
+
+  ctx.fillStyle = '#9cb1a8';
+  ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
+  wrapText(ctx, 'Cjelovita filmska kampanja: teaser trailer, intervjui, audio dizajn i neograničena prava.', 22, 105, w - 44, 16);
+
+  ctx.strokeStyle = '#1d362a';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(22, 140);
+  ctx.lineTo(w - 22, 140);
+  ctx.stroke();
+
+  const boxH = 72;
+  const boxY = h - boxH - 18;
+
+  const features = [
+    ['Hero Film 4K + 60s Teaser Trailer', ' (Filmski Master)'],
+    ['Intervjui s vodstvom + Teleprompter', ' (2 Kamere & Rasvjeta)'],
+    ['4x Vertikalna Video Reelsa', ' (Društvene Mreže)'],
+    ['Cjelovit FPV Paket sa Spotterom', ' + Test rute'],
+    ['Autorski Sound Design & SFX', ' + Color Grade'],
+    ['100% Prijenos Autorskih Prava', ' klijentu']
+  ];
+
+  const startY = 158;
+  const availH = boxY - 14 - startY;
+  const featSpacing = availH / (features.length - 1);
+
+  features.forEach(([bold, norm], idx) => {{
+    const featY = startY + idx * featSpacing;
+    ctx.fillStyle = '#10b981';
+    ctx.font = '800 13px "JetBrains Mono", monospace';
+    ctx.fillText('★', 24, featY);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 11.5px "Plus Jakarta Sans", sans-serif';
+    const boldW = ctx.measureText(bold).width;
+    ctx.fillText(bold, 44, featY);
+
+    ctx.fillStyle = '#9cb1a8';
+    ctx.font = '500 11.5px "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(norm, 44 + boldW, featY);
+  }});
+
+  ctx.fillStyle = '#13231e';
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, 16, boxY, w - 32, boxH, 8, true, true);
+
+  ctx.fillStyle = '#10b981';
+  ctx.font = '800 9.5px "JetBrains Mono", monospace';
+  ctx.fillText('UKUPNO ULAGANJE (OPCIJA B)', 28, boxY + 20);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 26px "Syne", sans-serif';
+  ctx.fillText('{total_price}', 28, boxY + 46);
+
+  ctx.fillStyle = '#10b981';
+  ctx.font = '600 9.5px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText('Oslobođeno PDV-a (Čl. 90. st. 2) • 0% PDV', 28, boxY + 62);
+}}
+
+window.customClothRenderers = {{
+  0: renderCardTextureA,
+  1: renderCardTextureB
+}};
+window.renderCardTextureA = renderCardTextureA;
+window.renderCardTextureB = renderCardTextureB;
+
+if (window.initClothCardPhysics) {{
+  window.initClothCardPhysics(window.customClothRenderers);
+}}
+"""
+        with open(custom_js_path, "w", encoding="utf-8") as f:
+            f.write(default_custom_js)
+
+    # 5. Compile Deck
     compile_deck(target_dir, deploy=deploy)
     return target_dir
 
@@ -200,3 +778,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
