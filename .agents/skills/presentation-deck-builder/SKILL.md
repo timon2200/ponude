@@ -38,6 +38,11 @@ Ovaj skill omogućuje orkestratoru i rojevima agenata brzo i pouzdano generiranj
 5. **Zabrana Autoplaya:** Prezentacijom upravlja isključivo korisnik (nema autoplay gumba niti intervala koji sami listaju slajdove).
 6. **Signature Styling (Option B):** Preporučeni prošireni paketi na Slajdu 5 i gumbi na Slajdu 6 imaju potpisnu tamnozelenu podlogu `#0d1815` s emerald obrubom `#10b981` i zvjezdicama `★`.
 7. **Službeni kontakt:** Uvijek `timon.terzic@gmail.com`.
+8. **Reference-First Generiranje Slika (STROGA ZABRANA TEKSTUALNOG IZMIŠLJANJA):**
+   - **Nikada ne generirati sliku samo iz teksta (text-only).** Ne trošiti kredite bez ulazne slike.
+   - Uvijek pronaći stvarnu fotografiju na internetu ili u arhivi i proslijediti je kao ulaz (Image 1) u Nano Banana 2 (2K rezolucija, 16:9).
+   - Obvezno primijeniti kanonski prompt za filmski color grade:
+     `"color grade the image. It is daylight, no clouds in the sky. backlit shot. Cold color grade, natural skin tones. Spotty direct sunlight, sunset, very contrasty image, sunlight creates hard shadows and a dramatic contrasty feel. , with dramatic shadows. Dramatic light and shadow play highlighting the depth and shape of the materials. Create a dreamy, nostalgic, and ethereal visual style reminiscent of a vintage 35mm film photograph taken during a perfect spring or summer golden hour. The atmosphere should feel romantic, soft, idyllic, and slightly melancholic, evoking a "cottagecore" or real-life Studio Ghibli aesthetic.<br><br>**Diffusion:** Apply a heavy soft-focus or diffusion filter effect (equivalent to a 1/4 or 1/2 Black Pro-Mist filter) to soften edges and create the signature dreamy glow. * **Grain:** Add a noticeable but organic medium 35mm film grain to tie the image together and add vintage texture. * **Optical Imperfections:** Include subtle vintage lens characteristics: prismatic light leaks, bokeh, soft edge vignetting, and gentle lens flares. * **Focus:** Utilize a shallow depth of field (low f-stop) for creamy, painted backgrounds. Introduce subtle motion blur if subjects are moving to enhance the candid, fleeting, and nostalgic mood.<br><br>"`
 
 ---
 

@@ -114,6 +114,30 @@ Svaki mikrosajt prilagođava paletu i tipografiju brendu i industriji klijenta, 
 
 ---
 
+## 3.5. Zlatno pravilo generiranja slika (Reference-First + Kanonski Color Grade)
+
+> [!CAUTION]
+> **STROGA ZABRANA IZMIŠLJANJA SLIKA IZ TEKSTA (NO TEXT-ONLY GENERATIONS):**
+> Zabranjeno je generirati slike isključivo iz tekstualnog prompta (text-to-image). Time se troše krediti i stvaraju neautentični, generički CGI prizori.
+> **UVIJEK I BEZ IZNIMKE ulaz u model mora biti STVARNA fotografija pronađena na internetu ili u lokalnoj arhivi.** Ako nema ulazne referentne slike, generiranje se NE POKREĆE.
+
+### Obvezni protokol obrade slika (Image-to-Image / Nano Banana 2):
+1. **Pronalazak stvarne fotografije:** Pretražiti web ili arhivu za autentičnu fotografiju lokacije, objekta, gradilišta ili subjekta (npr. stvarna zgrada bolnice, kampus, dvorac, dvorana).
+2. **Model i rezolucija:** **Nano Banana 2 (`gemini-3.1-flash-image`)**, 2K rezolucija, omjer **16:9**.
+3. **Ulazna slika (Image 1):** Proslijediti pronađenu fotografiju kao referencu.
+4. **Obvezni kanonski prompt za Color Grade i filmsku estetiku:**
+```text
+color grade the image. It is daylight, no clouds in the sky. backlit shot. Cold color grade, natural skin tones. 
+Spotty direct sunlight, sunset, very contrasty image, sunlight creates hard shadows and a dramatic contrasty feel. , with dramatic shadows. Dramatic light and shadow play highlighting the depth and shape of the materials.
+Create a dreamy, nostalgic, and ethereal visual style reminiscent of a vintage 35mm film photograph taken during a perfect spring or summer golden hour. The atmosphere should feel romantic, soft, idyllic, and slightly melancholic, evoking a "cottagecore" or real-life Studio Ghibli aesthetic.<br><br>**Diffusion:** Apply a heavy soft-focus or diffusion filter effect (equivalent to a 1/4 or 1/2 Black Pro-Mist filter) to soften edges and create the signature dreamy glow.
+* **Grain:** Add a noticeable but organic medium 35mm film grain to tie the image together and add vintage texture.
+* **Optical Imperfections:** Include subtle vintage lens characteristics: prismatic light leaks, bokeh, soft edge vignetting, and gentle lens flares.
+* **Focus:** Utilize a shallow depth of field (low f-stop) for creamy, painted backgrounds. Introduce subtle motion blur if subjects are moving to enhance the candid, fleeting, and nostalgic mood.<br><br>
+```
+5. **Pohrana asseta:** Generirani vizual se sprema u `assets/` ili `slike/` projekta pod standardnim imenom (npr. `01_<slug>_hero_2k.jpg`).
+
+---
+
 ## 4. Komponente i interaktivni mehanizmi (Obvezna matrica)
 
 Svaki prezentacijski mikrosajt mora implementirati sljedeći set mikro-interakcija:
