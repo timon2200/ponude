@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,500;0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Syne:wght@700;800;900&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Presentation Styles -->
+  <style>
+{{THEME_CSS}}
+
+{{CORE_CSS}}
+
+{{CUSTOM_CSS}}
+  </style>
+</head>
+<body>
+  <!-- Ambient Particle Canvas -->
+  <canvas id="canvasUiParticles" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:1;"></canvas>
+
+  <!-- Top App Navigation Bar -->
+  <header class="deck-header">
+    <div class="brand-mark">
+      <span>STUDIO VARAŽDIN</span>
+      <span class="tag">{{HEADER_TAG}}</span>
+    </div>
+
+    <div class="deck-controls-top">
+      <button class="btn-action" id="btnAutoplay" onclick="toggleAutoplay()" title="Automatska prezentacija">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="autoplayLabel">Auto Play</span>
+      </button>
+
+      <button class="btn-action btn-sound-toggle" id="btnSound" onclick="toggleSound()" title="Zvučni efekti (M)">
+        <span id="soundIconOff" style="display:inline-block;">🔇</span>
+        <span id="soundIconOn" style="display:none;">🔊</span>
+        <span id="soundLabel">Sound: OFF</span>
+      </button>
+
+      <button class="btn-action btn-fullscreen" onclick="document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()" title="Puni zaslon (F)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span>Fullscreen</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Deck Stage Container (16:9 Locked & Centered) -->
+  <main class="deck-stage">
+    <div class="slide-wrapper">
+{{SLIDES}}
+    </div>
+  </main>
+
+  <!-- Bottom HUD Navigation Bar -->
+  <footer class="deck-footer">
+    <div class="footer-left">
+      <div class="slide-counter">
+        <span class="counter-cur-wrapper"><span class="counter-cur" id="slideCurNum">01</span></span>
+        <span class="counter-sep">/</span>
+        <span class="counter-tot" id="slideTotNum">0{{TOTAL_SLIDES}}</span>
+      </div>
+      <span class="footer-dot-sep">•</span>
+      <div class="footer-slide-title-wrapper">
+        <span class="footer-slide-title" id="slideTitleText">{{FIRST_SLIDE_TITLE}}</span>
+      </div>
+    </div>
+
+    <!-- Centered Glider Navigation Track -->
+    <div class="footer-center">
+      <div class="slide-dots-track">
+{{SLIDE_DOTS}}
+      </div>
+    </div>
+
+    <div class="footer-right">
+      <button class="nav-btn" id="btnPrev" onclick="prevSlide()" disabled title="Prethodni slajd (←)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="nav-btn" id="btnNext" onclick="nextSlide()" title="Sljedeći slajd (→)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Video Modal Overlay -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-content">
+      <div class="video-modal-header">
+        <h4 id="videoModalTitle">Video Preview</h4>
+        <div class="video-modal-actions">
+          <a href="#" target="_blank" class="btn-yt-direct" id="btnWatchOnYt">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>Otvori na YouTube</span>
+          </a>
+          <button class="video-modal-close-btn" onclick="closeVideoModal()">✕ Zatvori</button>
+        </div>
+      </div>
+      <div class="video-iframe-wrapper">
+        <iframe id="videoIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules & Runtime -->
+  <script type="module">
+{{CORE_JS}}
+
+    // Global navigation bindings
+    const navigator = new DeckNavigator({
+      totalSlides: {{TOTAL_SLIDES}},
+      slideTitles: {{SLIDE_TITLES_JSON}}
+    });
+
+    window.navigatorInstance = navigator;
+    window.goToSlide = (idx) => navigator.goToSlide(idx);
+    window.nextSlide = () => navigator.nextSlide();
+    window.prevSlide = () => navigator.prevSlide();
+
+    // Autoplay Controller
+    let autoplayInterval = null;
+    window.toggleAutoplay = function() {
+      const btn = document.getElementById('btnAutoplay');
+      const label = document.getElementById('autoplayLabel');
+      if (autoplayInterval) {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+        if (label) label.textContent = 'Auto Play';
+        if (btn) btn.classList.remove('active');
+      } else {
+        if (label) label.textContent = 'Pause Auto';
+        if (btn) btn.classList.add('active');
+        autoplayInterval = setInterval(() => {
+          if (navigator.currentSlide < navigator.totalSlides) {
+            navigator.nextSlide();
+          } else {
+            navigator.goToSlide(1);
+          }
+        }, 5500);
+      }
+    };
+
+    // Initialize CanvasUI Effects
+    initCanvasUiParticles();
+    initRetroDither();
+    initVideoModal();
+  </script>
+
+  <!-- Project Specific JavaScript -->
+  <script>
+{{PROJECT_JS}}
+  </script>
+</body>
+</html>

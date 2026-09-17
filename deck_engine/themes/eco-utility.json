@@ -1,0 +1,23 @@
+{
+  "name": "Clean Eco-Studio & Modern Utility",
+  "id": "eco-utility",
+  "variables": {
+    "bg-canvas": "#f2f7f4",
+    "bg-card": "#ffffff",
+    "bg-card-subtle": "#e6f1ec",
+    "text-primary": "#0d1815",
+    "text-secondary": "#2d3f3a",
+    "text-muted": "#647a74",
+    "border-dark": "#0d1815",
+    "border-color": "#c4d7cf",
+    "accent-green": "#0d5c3a",
+    "accent-green-bright": "#10b981",
+    "accent-green-bg": "#e0f6eb",
+    "accent-green-border": "#a1dcc2",
+    "font-hero": "'Syne', sans-serif",
+    "font-display": "'Unbounded', sans-serif",
+    "font-sans": "'Plus Jakarta Sans', sans-serif",
+    "font-mono": "'JetBrains Mono', monospace",
+    "particle-color": "#0d5c3a"
+  }
+}

@@ -1,0 +1,233 @@
+/* Action Buttons */
+.btn-action {
+  background: var(--bg-card);
+  border: 2px solid var(--text-primary);
+  color: var(--text-primary);
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s var(--transition-smooth);
+  box-shadow: 2px 2px 0px var(--text-primary);
+  text-decoration: none;
+}
+
+.btn-action:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--text-primary);
+  background: var(--accent-green-bg);
+}
+
+.btn-action:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--text-primary);
+}
+
+/* Category Badges & Meta */
+.category-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.6rem;
+}
+
+.category-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+  border: 1px solid var(--accent-green-border);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-coords {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Titles and Typographic Hierarchy */
+.quote-title {
+  font-family: var(--font-hero);
+  font-size: clamp(1.8rem, 3.4vw, 3.2rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.quote-sub {
+  font-family: var(--font-sans);
+  font-size: clamp(0.95rem, 1.35vw, 1.2rem);
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text-primary);
+}
+
+.highlight {
+  background: linear-gradient(180deg, transparent 65%, var(--accent-green-bg) 65%);
+  padding: 0 4px;
+}
+
+.accent-bar {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-green-bright);
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Grids */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2.5rem;
+  align-items: center;
+  height: 100%;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Hero Action Grid & PDF Download (Slide 6 Standard) */
+.slide-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.btn-pdf-hero,
+.btn-auth-hero {
+  border: 2px solid var(--text-primary);
+  border-radius: 6px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-smooth);
+}
+
+.btn-pdf-hero {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  box-shadow: 4px 4px 0px var(--text-primary);
+}
+
+.btn-pdf-hero:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px var(--text-primary);
+  background: var(--accent-green-bg);
+}
+
+.btn-auth-hero {
+  background: var(--text-primary);
+  color: #ffffff;
+  box-shadow: 4px 4px 0px var(--accent-green);
+}
+
+.btn-auth-hero:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px var(--accent-green-bright);
+  background: var(--accent-green);
+}
+
+.btn-pdf-icon,
+.btn-auth-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-pdf-icon {
+  background: var(--text-primary);
+  color: #ffffff;
+}
+
+.btn-auth-icon {
+  background: var(--accent-green-bright);
+  color: #ffffff;
+}
+
+.btn-pdf-content,
+.btn-auth-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.btn-pdf-tag,
+.btn-auth-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.btn-pdf-tag {
+  color: var(--accent-green);
+}
+
+.btn-auth-tag {
+  color: var(--accent-green-bright);
+}
+
+.btn-pdf-title,
+.btn-auth-title {
+  font-family: var(--font-hero);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.btn-pdf-sub,
+.btn-auth-sub {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.btn-auth-sub {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.issuer-footer-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.75rem;
+  margin-top: 1rem;
+}

@@ -193,39 +193,68 @@ graph TD
     F -->|Git Push| G[varazdin.studio/website/<client-slug>/]
 ```
 
-### Struktura repozitorija i alata:
+### Struktura repozitorija i alata (Agent-First Modular Architecture):
 ```
 Ponude/
 ├── AGENTS.md                                   # Ovaj dokument (operativni protokol)
-├── .agents/skills/
-│   ├── presentation-deck-builder/SKILL.md     # Antigravity skill za izradu deckova
-│   └── naracija/                               # Symlink na ~/.claude/skills/naracija
+├── deck_engine/                                # DIJELJENI CORE ENGINE ZA SVE DECKOVE
+│   ├── core/
+│   │   ├── css/                                # variables.css, base.css, header.css, footer.css, components.css, modal.css, mobile.css
+│   │   ├── js/                                 # audio.js, odometer.js, modal.js, particles.js, cloth.js, navigation.js
+│   │   └── templates/
+│   │       ├── layout.html                     # Master HTML kostur s placeholderima
+│   │       └── default_slides/                 # 01_hero.html ... 06_auth.html
+│   └── themes/                                 # eco-utility.json, editorial-canvas.json, dark-luxury.json
+│
 ├── scripts/
-│   ├── orchestrate_presentation.py            # Master CLI orkestrator
-│   ├── fetch_ponuda.py                        # Ekstrakcija ponude iz API-ja ili PDF-a
-│   ├── generate_deck.py                       # Generator 16:9 koda prema temi
-│   └── validate_deck.py                       # QA auditor usklađenosti
-├── Komunalni_Prezentacija/                    # Lokalna mapa (Grad Varaždin & Čistoća)
-├── Meridian16_Prezentacija/                   # Lokalna mapa (Meridian 16)
+│   ├── build_deck.py                           # BRZI COMPILER (deck.json + slides/*.html -> index.html)
+│   ├── orchestrate_presentation.py             # Master CLI orkestrator (Ekstrakcija + Scaffolding + Build + QA)
+│   ├── fetch_ponuda.py                         # Ekstrakcija ponude iz API-ja ili PDF-a
+│   ├── generate_deck.py                        # Generator modularnog workspacea
+│   └── validate_deck.py                        # QA auditor usklađenosti
+│
+├── Meridian16_Prezentacija/                    # MODULARNI WORKSPACE KLIJENTA
+│   ├── deck.json                               # Metapodaci, cijene, kontakt e-mail, popis slajdova
+│   ├── slides/                                 # POJEDINAČNI ATOMSKI SLAJDOVI (30-50 linija svaki)
+│   │   ├── 01_hero.html
+│   │   ├── 02_concept.html
+│   │   ├── 03_formats.html
+│   │   ├── 04_production.html
+│   │   ├── 05_offer.html
+│   │   └── 06_auth.html
+│   ├── custom.css                              # Specifični stilovi prezentacije (opcionalno)
+│   ├── custom.js                               # Specifični skriptovi / WebGL cloth teksture (opcionalno)
+│   ├── index.html                              # Kompajlirani samostalni zero-dependency HTML
+│   └── slike/ / assets/                        # Slike i službeni PDF-ovi
+│
+├── Komunalni_Prezentacija/                     # (Modularni workspace za Grad Varaždin & Čistoću)
 └── ...
-
-Projekti/ (Izvor autentičnih materijala):
-└── <Naziv Projekta>/                          # Npr. "Grad Varazdin - Video otpad RRR"
-    ├── *.jpg, *.png                           # Stvarni kadrovi, fotografije, maskote
-    └── *.md                                   # Izvorni scenariji i reference
 ```
 
-### Automatizirane naredbe za agente:
+### Agent-First Uređivanje & Automatizirane naredbe:
+
+#### 1. Uređivanje postojećeg pitch decka:
+- **Izmjena teksta ili kadra:** Agent otvara samo ciljanu datoteku, npr. `Meridian16_Prezentacija/slides/02_concept.html`.
+- **Izmjena cijene ili e-maila:** Agent mijenja vrijednosti u `deck.json`.
+- **Recompilation & Deploy:**
+  ```bash
+  # Kompajlira i automatski postavlja na varazdin.studio:
+  python3 /Users/timonterzic/Documents/Ponude/scripts/build_deck.py Meridian16_Prezentacija --deploy
+
+  # Watch mod za rad uživo dok agent piše slajdove:
+  python3 /Users/timonterzic/Documents/Ponude/scripts/build_deck.py Meridian16_Prezentacija --watch --deploy
+  ```
+
+#### 2. Izrada novog pitch decka iz PDF-a ili Ponude.app:
 ```bash
-# 1. Master orkestracija (Ekstrakcija + Generiranje + QA Audit + Web Deploy)
 python3 /Users/timonterzic/Documents/Ponude/scripts/orchestrate_presentation.py \
   "/Users/timonterzic/Documents/Ponude/Naziv_Ponude.pdf" \
   --slug "klijent-slug" \
   --theme "eco-utility"
-
-# 2. Samo ekstrakcija ponude iz PDF-a ili Ponude.app API-ja:
-python3 /Users/timonterzic/Documents/Ponude/scripts/fetch_ponuda.py "/Users/timonterzic/Documents/Ponude/Naziv_Ponude.pdf"
-
-# 3. Samo QA Audit gotovog mikrosajta:
-python3 /Users/timonterzic/Documents/Ponude/scripts/validate_deck.py "/Users/timonterzic/Documents/Ponude/Klijent_Prezentacija/index.html"
 ```
+
+#### 3. QA Audit usklađenosti:
+```bash
+python3 /Users/timonterzic/Documents/Ponude/scripts/validate_deck.py "/Users/timonterzic/Documents/Ponude/Meridian16_Prezentacija/index.html"
+```
+

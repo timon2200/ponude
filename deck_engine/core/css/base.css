@@ -1,0 +1,204 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.35;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  position: relative;
+}
+
+/* Background Ambient Canvas */
+#ambient-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.55;
+}
+
+/* Main Deck Stage Container (16:9 Locked & Centered) */
+main.deck-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem 5.5rem 2.5rem;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.slide-wrapper {
+  width: 100%;
+  background-color: var(--bg-card);
+  max-width: 1440px;
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 135px);
+  background: var(--bg-card);
+  border: 2px solid var(--text-primary);
+  box-shadow: 8px 8px 0px rgba(17, 21, 24, 0.16);
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Slide Base */
+.slide {
+  display: none;
+  background-color: var(--bg-card);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: clamp(1.6rem, 2.5vw, 2.4rem) clamp(2rem, 3.2vw, 3.5rem);
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: var(--bg-card);
+  box-sizing: border-box;
+}
+
+.slide.active {
+  display: flex;
+  opacity: 1;
+  position: relative;
+}
+
+/* Scoped View Transitions - Isolated to Active Slide */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+}
+
+::view-transition-group(root) {
+  animation: none !important;
+}
+
+.slide.active {
+  view-transition-name: active-slide-body;
+}
+
+::view-transition-group(active-slide-body) {
+  animation-duration: 0.38s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-out-to-left {
+  0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0px); }
+  100% { transform: translateX(-35px) scale(0.98); opacity: 0; filter: blur(2px); }
+}
+@keyframes slide-in-from-right {
+  0% { transform: translateX(35px) scale(0.98); opacity: 0; filter: blur(2px); }
+  100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0px); }
+}
+@keyframes slide-out-to-right {
+  0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0px); }
+  100% { transform: translateX(35px) scale(0.98); opacity: 0; filter: blur(2px); }
+}
+@keyframes slide-in-from-left {
+  0% { transform: translateX(-35px) scale(0.98); opacity: 0; filter: blur(2px); }
+  100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0px); }
+}
+
+html:active-view-transition-type(forward)::view-transition-old(active-slide-body) {
+  animation-name: slide-out-to-left;
+  animation-duration: 0.32s;
+}
+html:active-view-transition-type(forward)::view-transition-new(active-slide-body) {
+  animation-name: slide-in-from-right;
+  animation-duration: 0.38s;
+}
+html:active-view-transition-type(backward)::view-transition-old(active-slide-body) {
+  animation-name: slide-out-to-right;
+  animation-duration: 0.32s;
+}
+html:active-view-transition-type(backward)::view-transition-new(active-slide-body) {
+  animation-name: slide-in-from-left;
+  animation-duration: 0.38s;
+}
+
+/* Staggered Item Entrance */
+@keyframes slideItemReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide.active .quote-title {
+  animation: slideItemReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.03s both;
+}
+.slide.active .quote-sub,
+.slide.active .punchy-narration {
+  animation: slideItemReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.07s both;
+}
+.slide.active .category-badge-row,
+.slide.active .grid-2col,
+.slide.active .grid-3col,
+.slide.active .slide-actions-grid {
+  animation: slideItemReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.11s both;
+}
+
+/* Print Stylesheet for 16:9 PDF Export */
+@media print {
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+  header.deck-header,
+  footer.deck-footer,
+  #canvasUiParticles,
+  .video-modal {
+    display: none !important;
+  }
+  main.deck-stage {
+    padding: 0 !important;
+    height: auto !important;
+  }
+  .slide-wrapper {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+  .slide {
+    display: flex !important;
+    opacity: 1 !important;
+    position: relative !important;
+    page-break-after: always;
+    break-after: page;
+    height: 100vh !important;
+    aspect-ratio: 16 / 9 !important;
+  }
+}
+

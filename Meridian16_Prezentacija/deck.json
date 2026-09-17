@@ -1,0 +1,55 @@
+{
+  "title": "Meridian 16 — Cinematic Film Pitch | Studio Varaždin",
+  "client_name": "Meridian 16",
+  "slug": "meridian16",
+  "theme": "editorial-canvas",
+  "header_tag": "DIRECT VIDEO PITCH",
+  "contact_email": "timon.terzic@gmail.com",
+  "total": "€ 17,000",
+  "pdf_path": "Quote_No15_OptionB_17000.pdf",
+  "issuer": {
+    "name": "STUDIO VARAŽDIN",
+    "owner": "Jasenka Martinčević",
+    "address": "Varaždin / Zagreb",
+    "oib": "63287352089",
+    "partner": "Lotus RC"
+  },
+  "slides": [
+    {
+      "id": 1,
+      "file": "slides/01_hero.html",
+      "title": "The Creative Collective",
+      "category": "Creative Collective • Croatia"
+    },
+    {
+      "id": 2,
+      "file": "slides/02_concept.html",
+      "title": "Croatian Mint (Scale Duality)",
+      "category": "Proof of Quality • Scale Duality"
+    },
+    {
+      "id": 3,
+      "file": "slides/03_formats.html",
+      "title": "FPV Specialty (Speed & Scale)",
+      "category": "Drone Cinema • Global Brands"
+    },
+    {
+      "id": 4,
+      "file": "slides/04_production.html",
+      "title": "The Meridian 16 Vision (Sunrise & Scale)",
+      "category": "The Creative Vision • Meridian 16"
+    },
+    {
+      "id": 5,
+      "file": "slides/05_offer.html",
+      "title": "Commercial Proposals (Essential vs Signature)",
+      "category": "Commercial Proposals • Meridian 16"
+    },
+    {
+      "id": 6,
+      "file": "slides/06_auth.html",
+      "title": "What Are Your Goals For The Future?",
+      "category": "Partnership & Authorization"
+    }
+  ]
+}

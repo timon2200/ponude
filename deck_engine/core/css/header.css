@@ -1,0 +1,40 @@
+header.deck-header {
+  height: 54px;
+  background: rgba(244, 239, 228, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 2px solid var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
+.brand-mark .tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: var(--text-primary);
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deck-controls-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
