@@ -227,12 +227,18 @@ def compile_deck(deck_dir, deploy=False, theme_override=None):
         with open(web_index, 'w', encoding='utf-8') as f:
             f.write(final_html)
 
-        # Sync assets/slike if they exist
+        # Sync assets/slike if they exist to both assets and slike web directories
         for asset_src in [deck_dir / "assets", deck_dir / "slike"]:
             if asset_src.exists():
-                web_assets = web_dir / "assets"
-                os.makedirs(web_assets, exist_ok=True)
-                os.system(f"cp -r '{asset_src}'/* '{web_assets}'/ 2>/dev/null || true")
+                for sub in ["assets", "slike"]:
+                    target_sub = web_dir / sub
+                    os.makedirs(target_sub, exist_ok=True)
+                    os.system(f"cp -r '{asset_src}'/* '{target_sub}'/ 2>/dev/null || true")
+
+        # Also copy any root-level PDFs
+        for pdf_file in deck_dir.glob("*.pdf"):
+            shutil_cmd = f"cp '{pdf_file}' '{web_dir}'/ 2>/dev/null || true"
+            os.system(shutil_cmd)
 
         print(f"🚀 Deployed to varazdin.studio website: {web_dir}")
 

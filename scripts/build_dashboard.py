@@ -214,7 +214,7 @@ DECK_CATALOG = {
         "badge_color": "green",
         "is_signature": False,
         "theme": "eco-utility",
-        "hero_rel": "assets/hero_landscape.jpg",
+        "hero_rel": "assets/01_koprivnica_dvorane.jpg",
         "pdf_rel": "assets/Ponuda_Koprivnica_Zemlja_Gradi_2026_KK_06.pdf",
         "date": "2026-09"
     },
@@ -233,7 +233,7 @@ DECK_CATALOG = {
         "badge_color": "gold",
         "is_signature": True,
         "theme": "eco-utility",
-        "hero_rel": "assets/terme_bjelovar_hero.jpg",
+        "hero_rel": "assets/01_bjelovar_terme_korenovo.jpg",
         "pdf_rel": "assets/Ponuda_Grad_Bjelovar_Terme_2026_BJ_07.pdf",
         "date": "2026-09"
     },
@@ -252,8 +252,8 @@ DECK_CATALOG = {
         "badge_color": "green",
         "is_signature": False,
         "theme": "editorial-canvas",
-        "hero_rel": "slike/thumb_fpv_campus_reel.jpg",
-        "pdf_rel": "Ponuda_Sveta_Nedelja_OpcijaB_19500.pdf",
+        "hero_rel": "assets/sveta_nedelja_hero.jpg",
+        "pdf_rel": "assets/Ponuda_Sveta_Nedelja_OpcijaB_19500.pdf",
         "date": "2026-09"
     }
 }
@@ -324,7 +324,7 @@ def generate_dashboard_html(decks):
           <div class="video-thumb-crazy-wrapper">
             <!-- Direct click to open deck in new tab -->
             <a href="{d['live_url']}" target="_blank" class="video-thumb-crazy" title="Otvori {d['title']}">
-              <img src="assets/thumbnails/{thumb_name}" alt="{d['title']}" class="card-thumb" loading="lazy" onerror="this.src='../{d['folder']}/{d['hero_rel']}'">
+              <img src="assets/thumbnails/{thumb_name}" alt="{d['title']}" class="card-thumb" loading="lazy" onerror="this.onerror=null; this.src='../{d['slug']}/{d['hero_rel']}';">
               <div class="play-btn-crazy">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </div>
